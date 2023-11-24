@@ -1,6 +1,8 @@
 import Format from "@/src/models/Format";
 import Genres from "@/src/models/Genres";
+import Suscription from "@/src/models/Suscription";
 import Role from "@/src/models/Role";
+
 
 export const createRoles = async () => {
     try {
@@ -18,6 +20,24 @@ export const createRoles = async () => {
       console.error(error);
     }
   };
+;
+
+export const createSuscription = async () => {
+  try {
+    const count = await Suscription.estimatedDocumentCount();
+
+    if (count > 0) return;
+
+    const values = await Promise.all([
+      new Suscription({ name: "default" }).save(),
+      new Suscription({ name: "premium" }).save(),
+    ]);
+
+    console.log(values);
+  } catch (error) {
+    console.error(error);
+  }
+};
 ;
 
 export const createFormat = async () => {

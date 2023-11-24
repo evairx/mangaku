@@ -31,6 +31,10 @@ const UserSchema = new Schema({
         ref: "Role",
         type: String,
     }],
+    suscription: [{
+        ref: "Suscription",
+        type: String,
+    }],
     avatarId: {
         type: String,
         default: "72b45e6b-6cc8-4593-8a69-926429e2d4f4"

@@ -25,9 +25,9 @@ export default async function handler(req, res) {
             return res.status(401).json({ message: "Usuario no encontrado" });
         }
 
-        const { _id, username, email, roles, favorites, date } = user;
+        const { _id, username, email, roles, suscription, favorites, date } = user;
 
-        return res.json({ _id, username, email, roles, favorites, date});
+        return res.json({ _id, username, email, roles,suscription, favorites, date});
 
     } else {
         return res.status(400).json({ error: {} });

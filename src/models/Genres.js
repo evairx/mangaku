@@ -13,4 +13,4 @@ const genresScheme = new Schema({
     versionKey: false,
 });
 
-export default models.genres || model('genres', genresScheme);
+export default models.Genres || model('Genres', genresScheme);

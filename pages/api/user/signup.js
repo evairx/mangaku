@@ -1,7 +1,8 @@
 import Connect from "@/db/connect";
 import UserModel from "@/src/models/User"
 import Role from "@/src/models/Role";
-import { createRoles } from "@/middleware/generate"
+import Suscription from "@/src/models/Suscription";
+import { createRoles , createSuscription} from "@/middleware/generate"
 
 export default async function handler(req, res) {
     const { method } = req;
@@ -9,6 +10,7 @@ export default async function handler(req, res) {
     if (method === "POST") {
         await Connect()
         await createRoles()
+        await createSuscription()
 
         const existingUser = await UserModel.findOne({ email: req.body.email });
 
@@ -22,6 +24,11 @@ export default async function handler(req, res) {
         const foundRoles = await Role.find({ name: { $in: roles } });
 
         user.roles = foundRoles.map((role) => role.name);
+
+        let suscription = ["default"]
+        const foundSuscription = await Suscription.find({ name: { $in: suscription } });
+
+        user.suscription = foundSuscription.map((suscription) => suscription.name);
 
         await user.encryptPassword(req.body.password);
         
