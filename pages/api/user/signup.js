@@ -1,12 +1,14 @@
 import Connect from "@/db/connect";
 import UserModel from "@/src/models/User"
 import Role from "@/src/models/Role";
+import { createRoles } from "@/middleware/generate"
 
 export default async function handler(req, res) {
     const { method } = req;
 
     if (method === "POST") {
         await Connect()
+        await createRoles()
 
         const existingUser = await UserModel.findOne({ email: req.body.email });
 

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pre:generate": "node ./middleware/generate.js"
   },
   "dependencies": {
     "next": "12.3.4",
