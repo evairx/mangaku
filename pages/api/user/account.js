@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         const getToken = req.headers.authorization;
 
         if(!getToken) {
-            return res.status(401).json({ no_token: {} });
+            res.status(401).json({ no_token: {} });
         }
 
         await Connect()
@@ -22,14 +22,14 @@ export default async function handler(req, res) {
         const user = await UserModel.findById(userId);
 
         if (!user) {
-            return res.status(401).json({ message: "Usuario no encontrado" });
+            res.status(401).json({ message: "Usuario no encontrado" });
         }
 
         const { _id, username, email, roles, suscription, favorites, date } = user;
 
-        return res.json({ _id, username, email, roles,suscription, favorites, date});
+        res.json({ _id, username, email, roles,suscription, favorites, date});
 
     } else {
-        return res.status(400).json({ error: {} });
+        res.status(400).json({ error: {} });
     }
 }

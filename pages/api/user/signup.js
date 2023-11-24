@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         const existingUser = await UserModel.findOne({ email: req.body.email });
 
         if (existingUser) {
-            return res.status(400).json({ message: "El correo electrónico ya está registrado" });
+            res.status(400).json({ message: "El correo electrónico ya está registrado" });
         }
 
         const user = await UserModel.create(req.body);
@@ -36,6 +36,6 @@ export default async function handler(req, res) {
 
         res.status(200).json({ message: "El usuario se creó correctamente" });
     } else {
-        return res.redirect("/");
+        res.redirect("/");
     }
 }

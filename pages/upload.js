@@ -1,0 +1,205 @@
+import React, { useState } from 'react';
+import Connect from '@/db/connect';
+import Genres from '@/src/models/Genres';
+import Format from '@/src/models/Format';
+import Status from '@/src/models/Status';
+import styled from '@emotion/styled';
+import Layout from "@/layout/Main"
+
+const Container = styled.main`
+  /* Tu estilo aquí */
+`
+
+const Checkbox = ({ label, value, onChange }) => {
+  return (
+      <label>
+        <input
+          type="checkbox"
+          value={value}
+          onChange={(e) => onChange(value, e.target.checked)}
+        />
+        {label}
+      </label>
+  );
+};
+
+const Upload = ({ genres, format, status }) => {
+  const [filesToUpload, setFilesToUpload] = useState([]);
+  const [formData, setFormData] = useState({
+    title: '',
+    overview: '',
+    format: '', // Cambiado a un string para almacenar el ID seleccionado
+    genres: [],
+    status: ''
+  });
+  const [selectedGenres, setSelectedGenres] = useState([]);
+
+  const handleFileChange = (event) => {
+    const selectedFiles = event.target.files;
+    setFilesToUpload(selectedFiles);
+
+    const statusElement = document.getElementById('status');
+    const fileCount = selectedFiles.length;
+    statusElement.innerText =
+      fileCount > 0 ? fileCount + ' imagen seleccionada(s)' : 'Esperando imagen...';
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const uploadManga = async () => {
+    if (filesToUpload.length > 0) {
+      try {
+        const response = await fetch('http://localhost:3000/api/manga/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            genres: selectedGenres
+          }),
+        });
+  
+        if (response.ok) {
+          const responseData = await response.json();
+          const { id } = responseData;
+          console.log('Primer POST exitoso. ID:', id);
+  
+          const filesArray = Array.from(filesToUpload);
+          filesArray.forEach((file) => uploadPoster(file, id));
+  
+          setFilesToUpload([]);
+        } else {
+          console.error('Error en el primer POST');
+        }
+      } catch (error) {
+        console.error('Error en la solicitud:', error);
+      }
+    } else {
+      alert('Seleccione al menos una imagen antes de subir.');
+    }
+  };
+
+  const uploadPoster = async (file, id) => {
+    console.log('Cargando archivo:', file.name);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const uploadResponse = await fetch(`http://localhost:4000/poster/${id}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (uploadResponse.ok) {
+        console.log('Segundo POST exitoso para el archivo:', file.name);
+      } else {
+        console.error('Error en el segundo POST para el archivo:', file.name);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
+  };
+
+  const handleCheckboxChange = (value, isChecked) => {
+    if (isChecked) {
+      setSelectedGenres((prevGenres) => [...prevGenres, value]);
+    } else {
+      setSelectedGenres((prevGenres) => prevGenres.filter((genre) => genre !== value));
+    }
+  };
+
+  const layout = {
+    title: 'xdsss',
+    description: '3'
+  }
+
+  return (
+    <Layout layout={layout}>
+      <Container>
+        <p className="labelInput"></p>
+        <div id="drop-area">
+          <input
+            type="file"
+            id="file"
+            name="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+          <label htmlFor="files">Seleccionar Imagenes</label>
+        </div>
+        <section>
+          <br />
+          <p id="status"></p>
+
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={formData.title}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="overview"
+            placeholder="Overview"
+            value={formData.overview}
+            onChange={handleInputChange}
+          />
+          <br></br>
+
+          <select
+            name="format"
+            value={formData.format}
+            onChange={handleInputChange}
+          >
+            <option value="">Seleccione un formato</option>
+            {format.map((format, index) => (
+              <option value={format._id} key={index}>{format.name}</option>
+            ))}
+          </select>
+
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange}
+          >
+            <option value="">Seleccione el estado</option>
+            {status.map((status, index) => (
+              <option value={status._id} key={index}>{status.name}</option>
+            ))}
+          </select>
+          
+          <br></br>
+            {genres.map((genre, index) => (
+              <Checkbox key={index} label={genre.name} value={genre._id} onChange={handleCheckboxChange} />
+            ))}
+          <button onClick={uploadManga}>Subir Imágenes y Datos</button>
+        </section>
+      </Container>
+    </Layout>
+  );
+};
+
+export default Upload;
+
+export async function getServerSideProps() {
+  await Connect()
+  const genres = await Genres.find()
+  const format = await Format.find()
+  const status = await Status.find()
+  return {
+    props: {
+      genres: JSON.parse(JSON.stringify(genres)),
+      format: JSON.parse(JSON.stringify(format)),
+      status: JSON.parse(JSON.stringify(status)),
+    }
+  }
+}
