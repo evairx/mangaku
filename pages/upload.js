@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Connect from '@/db/connect';
 import Genres from '@/src/models/Genres';
 import Format from '@/src/models/Format';
@@ -70,7 +70,7 @@ const Checkbox = ({ label, value, onChange }) => {
   );
 };
 
-const Upload = ({ genres, format, status }) => {
+const Upload = ({ genres, format, status, url }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -80,6 +80,17 @@ const Upload = ({ genres, format, status }) => {
     status: ''
   });
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [tokenCookie, setTokenCookie] = useState('');
+
+  useEffect(() => {
+    const tokenValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+    
+    setTokenCookie(tokenValue);
+  }, []);
+
 
   const handleFileChange = (event) => {
     const selectedFiles = event.target.files;
@@ -102,7 +113,7 @@ const Upload = ({ genres, format, status }) => {
   const uploadManga = async () => {
     if (filesToUpload.length > 0) {
       try {
-        const response = await fetch('http://localhost:3000/api/manga/upload', {
+        const response = await fetch(`${url}/api/manga/upload`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -140,9 +151,12 @@ const Upload = ({ genres, format, status }) => {
     formData.append('file', file);
 
     try {
-      const uploadResponse = await fetch(`http://localhost:4000/poster/${id}`, {
+      const uploadResponse = await fetch(`${url}/cdn/poster/${id}`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Authorization': `Bearer ${tokenCookie}`
+        },
       });
 
       if (uploadResponse.ok) {
@@ -249,11 +263,14 @@ export async function getServerSideProps() {
   const format = await Format.find()
   const status = await Status.find()
 
+  const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `${req.connection.encrypted ? 'https' : 'http'}://${req.headers.host}`;
+
   return {
     props: {
       genres: JSON.parse(JSON.stringify(genres)),
       format: JSON.parse(JSON.stringify(format)),
       status: JSON.parse(JSON.stringify(status)),
+      url,
     }
   }
 }
