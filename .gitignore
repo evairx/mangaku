@@ -16,3 +16,5 @@ vercel.json
 
 # Package manager
 package-lock.json
+
+.vercel

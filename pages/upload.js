@@ -3,23 +3,70 @@ import Connect from '@/db/connect';
 import Genres from '@/src/models/Genres';
 import Format from '@/src/models/Format';
 import Status from '@/src/models/Status';
+import { createFormat } from "@/middleware/generate"
+import UploadIcon from '@/src/icon/upload';
 import styled from '@emotion/styled';
 import Layout from "@/layout/Main"
 
-const Container = styled.main`
+const Container = styled.section`
   /* Tu estilo aquí */
 `
 
+const ContainerDrop = styled.article`
+  display:flex;
+  justify-content:center;
+`
+
+const Drop = styled.div`
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  width:400px;
+  margin:0 auto;
+  text-align:center;
+  margin-top:2rem;
+  padding:1rem;
+  border-radius:4px;
+`
+
+const StyledInput = styled.input`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+`;
+
+const CheckboxSection = styled.section`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width:80%;
+  margin:0 auto;
+  background:#333;
+  padding:1rem;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap:.200rem;
+`;
+
 const Checkbox = ({ label, value, onChange }) => {
   return (
-      <label>
+      <CheckboxLabel>
         <input
           type="checkbox"
           value={value}
           onChange={(e) => onChange(value, e.target.checked)}
         />
         {label}
-      </label>
+      </CheckboxLabel>
   );
 };
 
@@ -28,7 +75,7 @@ const Upload = ({ genres, format, status }) => {
   const [formData, setFormData] = useState({
     title: '',
     overview: '',
-    format: '', // Cambiado a un string para almacenar el ID seleccionado
+    format: '',
     genres: [],
     status: ''
   });
@@ -124,20 +171,23 @@ const Upload = ({ genres, format, status }) => {
   return (
     <Layout layout={layout}>
       <Container>
-        <p className="labelInput"></p>
-        <div id="drop-area">
-          <input
-            type="file"
-            id="file"
-            name="file"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-          <label htmlFor="files">Seleccionar Imagenes</label>
-        </div>
+        <ContainerDrop>
+          <Drop>
+            <StyledInput
+              type="file"
+              id="file"
+              name="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <div>
+              <UploadIcon width={34} height={34}/>
+            </div>
+            <label htmlFor="files">Seleccionar Poster</label>
+            <p id="status"></p>
+          </Drop>
+        </ContainerDrop>
         <section>
-          <br />
-          <p id="status"></p>
 
           <input
             type="text"
@@ -177,10 +227,11 @@ const Upload = ({ genres, format, status }) => {
             ))}
           </select>
           
-          <br></br>
+          <CheckboxSection>
             {genres.map((genre, index) => (
               <Checkbox key={index} label={genre.name} value={genre._id} onChange={handleCheckboxChange} />
             ))}
+          </CheckboxSection>
           <button onClick={uploadManga}>Subir Imágenes y Datos</button>
         </section>
       </Container>
@@ -192,9 +243,12 @@ export default Upload;
 
 export async function getServerSideProps() {
   await Connect()
+  await createFormat()
+
   const genres = await Genres.find()
   const format = await Format.find()
   const status = await Status.find()
+
   return {
     props: {
       genres: JSON.parse(JSON.stringify(genres)),

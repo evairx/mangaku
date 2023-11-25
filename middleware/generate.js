@@ -48,6 +48,8 @@ export const createFormat = async () => {
   
       const values = await Promise.all([
         new Format({ name: "Manga" }).save(),
+        new Format({ name: "Novela Ligera" }).save(),
+        new Format({ name: "One Shot" }).save(),
       ]);
   
       console.log(values);

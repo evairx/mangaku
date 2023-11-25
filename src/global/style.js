@@ -19,6 +19,7 @@ export default function GlobalStyles({theme}) {
     :root {
       --dark:#000;
       --light:#eee;
+      --border: ${theme === "--dark" ? "#eee": "#000"};
     }
 
     * {
