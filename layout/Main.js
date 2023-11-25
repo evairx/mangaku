@@ -13,6 +13,7 @@ export default function Main({ children,  layout }) {
 
     return (
       <>
+        <GlobalStyle theme={theme}/>
         <Head>
             <title>{layout?.title}</title>
             <meta name="description" content={layout?.description} />
@@ -23,8 +24,21 @@ export default function Main({ children,  layout }) {
             <meta property="og:url" content=""/>
             <link rel="icon" href="/favicon.ico" />
             <link rel="manifest" href="/manifest.json" />
+            <link
+              rel="preload"
+              href="/fonts/Inter-400.woff2"
+              as="font"
+              type="font/woff2"
+              crossOrigin="anonymous"
+          />
+          <link
+              rel="preload"
+              href="/fonts/Inter-600.woff2"
+              as="font"
+              type="font/woff2"
+              crossOrigin="anonymous"
+          />
         </Head>
-        <GlobalStyle theme={theme}/>
         <main>
           {children}
         </main>

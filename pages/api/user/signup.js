@@ -1,7 +1,7 @@
 import Connect from "@/db/connect";
-import UserModel from "@/src/models/User"
-import Role from "@/src/models/Role";
-import Suscription from "@/src/models/Suscription";
+import UserModel from "@/models/User"
+import Role from "@/models/Role";
+import Suscription from "@/models/Suscription";
 import { createRoles , createSuscription} from "@/middleware/generate"
 
 export default async function handler(req, res) {

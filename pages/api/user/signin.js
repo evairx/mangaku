@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import UserModel from "@/src/models/User"
+import UserModel from "@/models/User"
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 

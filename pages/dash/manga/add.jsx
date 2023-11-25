@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Connect from '@/db/connect';
-import Genres from '@/src/models/Genres';
-import Format from '@/src/models/Format';
-import Status from '@/src/models/Status';
+import Genres from '@/models/Genres';
+import Format from '@/models/Format';
+import Status from '@/models/Status';
 import { createFormat } from "@/middleware/generate"
+import jwt from "jsonwebtoken"
 import UploadIcon from '@/src/icon/upload';
 import styled from '@emotion/styled';
 import Layout from "@/layout/Main"
+import User from '@/models/User';
 
 const Container = styled.section`
   /* Tu estilo aquí */
@@ -70,7 +72,7 @@ const Checkbox = ({ label, value, onChange }) => {
   );
 };
 
-const Upload = ({ genres, format, status, url }) => {
+const AddManga = ({ genres, format, status, url, token }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -80,17 +82,6 @@ const Upload = ({ genres, format, status, url }) => {
     status: ''
   });
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [tokenCookie, setTokenCookie] = useState('');
-
-  useEffect(() => {
-    const tokenValue = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1];
-    
-    setTokenCookie(tokenValue);
-  }, []);
-
 
   const handleFileChange = (event) => {
     const selectedFiles = event.target.files;
@@ -155,7 +146,7 @@ const Upload = ({ genres, format, status, url }) => {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${tokenCookie}`
+          'Authorization': `Bearer ${token}`
         },
       });
 
@@ -253,24 +244,77 @@ const Upload = ({ genres, format, status, url }) => {
   );
 };
 
-export default Upload;
+export default AddManga;
 
-export async function getServerSideProps() {
-  await Connect()
-  await createFormat()
+export async function getServerSideProps(context) {
+  try {
+    await Connect()
+    await createFormat()
+  
+    const genres = await Genres.find()
+    const format = await Format.find()
+    const status = await Status.find()
 
-  const genres = await Genres.find()
-  const format = await Format.find()
-  const status = await Status.find()
+    const token = context.req.headers.cookie
+    ?.split('; ')
+    .find(row => row.startsWith('token='))
+    ?.split('=')[1] || null;
 
-  const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `${req.connection.encrypted ? 'https' : 'http'}://${req.headers.host}`;
+    if (!token) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+        props: {},
+      };
+    }
 
-  return {
-    props: {
-      genres: JSON.parse(JSON.stringify(genres)),
-      format: JSON.parse(JSON.stringify(format)),
-      status: JSON.parse(JSON.stringify(status)),
-      url,
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+  
+    const userId = decodedToken.id;
+  
+    const user = await User.findById(userId);
+  
+    if (!user) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+        props: {},
+      };
+    }
+  
+    const rol = user.roles[0];
+  
+    if(rol !== "admin") {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+        props: {},
+      };
+    }
+  
+    console.log(userId)
+  
+    const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `${req.connection.encrypted ? 'https' : 'http'}://${req.headers.host}`;
+  
+    return {
+      props: {
+        genres: JSON.parse(JSON.stringify(genres)),
+        format: JSON.parse(JSON.stringify(format)),
+        status: JSON.parse(JSON.stringify(status)),
+        url,
+        token,
+      }
+    }
+  } catch (err) {
+    console.log(err)
+    return {
+      props: {}
     }
   }
 }

@@ -1,8 +1,8 @@
 import Connect from "@/db/connect";
-import Manga from "@/src/models/Manga";
-import Genres from '@/src/models/Genres';
-import Format from '@/src/models/Format';
-import Status from '@/src/models/Status';
+import Manga from "@/models/Manga";
+import Genres from '@/models/Genres';
+import Format from '@/models/Format';
+import Status from '@/models/Status';
 
 export default async function handler(req, res) {
     const { method } = req;
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
             try {
                 const posterResponse = await fetch(`${serverUrl}/cdn/api/poster/${posterId}`, {
                     headers: {
-                        'Authorization': `Bearer ${process.env.TOKEN_APP}`
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMDc5NTczOSwiZXhwIjoxNzAzNDIzNzM5fQ.XxlDFjKvsKp3Pcp8uabPTivr9oN3-4JveXiFjCOLmGc'
                     }
                 });
 
@@ -61,6 +61,8 @@ export default async function handler(req, res) {
                 console.error('Error en la solicitud fetch:', error);
                 manga.poster = null;
             }
+
+            console.log(manga.poster)
 
             return {
                 _id: manga._id,

@@ -3,9 +3,7 @@ import { useState } from "react";
 export default function Signin({ url }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1");
-    console.log(token)
-  
+    
     const handleSubmit = async (e) => {
       e.preventDefault();
   

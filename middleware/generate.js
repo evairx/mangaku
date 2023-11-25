@@ -1,7 +1,7 @@
-import Format from "@/src/models/Format";
-import Genres from "@/src/models/Genres";
-import Suscription from "@/src/models/Suscription";
-import Role from "@/src/models/Role";
+import Format from "@/models/Format";
+import Genres from "@/models/Genres";
+import Suscription from "@/models/Suscription";
+import Role from "@/models/Role";
 
 
 export const createRoles = async () => {
