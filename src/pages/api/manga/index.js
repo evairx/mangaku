@@ -3,6 +3,7 @@ import Manga from "@/models/Manga";
 import Genres from '@/models/Genres';
 import Format from '@/models/Format';
 import Status from '@/models/Status';
+import jwt from "jsonwebtoken"
 
 export default async function handler(req, res) {
     const { method } = req;
@@ -30,15 +31,16 @@ export default async function handler(req, res) {
             const genres = await Genres.find({ _id: { $in: genresIds } });
             manga.genres = genres.map(genre => genre.name);
 
-            const serverUrl = process.env.NODE_ENV === 'development'
-                ? `http://localhost:${process.env.PORT || 3000}`
-                :
-                `${req.connection.encrypted ? 'https' : 'http'}://${req.headers.host}`;
+            const serverUrl = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `https://${req.headers.host}`;
+
+            const expireDate = Math.floor(Date.now() / 1000) + 20;
+
+            const tokenImg = jwt.sign({ exp: expireDate }, process.env.SECRET);
 
             const posterId = manga._id;
 
             try {
-                const posterResponse = await fetch(`${serverUrl}/cdn/api/poster/${posterId}`, {
+                const posterResponse = await fetch(`${serverUrl}/static/api/poster/${posterId}`, {
                     headers: {
                         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMDc5NTczOSwiZXhwIjoxNzAzNDIzNzM5fQ.XxlDFjKvsKp3Pcp8uabPTivr9oN3-4JveXiFjCOLmGc'
                     }
@@ -55,14 +57,12 @@ export default async function handler(req, res) {
                     }
                 } else {
                     const posterData = await posterResponse.json();
-                    manga.poster = `${serverUrl}/cdn/poster/${posterId}/${posterData.contents[0]}`;
+                    manga.poster = `${serverUrl}/static/bucket/poster/${posterId}/${posterData.contents[0]}?a=${tokenImg}`;
                 }
             } catch (error) {
                 console.error('Error en la solicitud fetch:', error);
                 manga.poster = null;
             }
-
-            console.log(manga.poster)
 
             return {
                 _id: manga._id,

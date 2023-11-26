@@ -300,7 +300,7 @@ export async function getServerSideProps(context) {
   
     console.log(userId)
   
-    const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `${req.connection.encrypted ? 'https' : 'http'}://${req.headers.host}`;
+    const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `https://${req.headers.host}`;
   
     return {
       props: {

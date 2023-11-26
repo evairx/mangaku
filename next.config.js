@@ -2,7 +2,7 @@ module.exports = () => {
   const rewrites = () => {
     return [
       {
-        source: "/cdn/:path*",
+        source: "/static/:path*",
         destination: `${process.env.CDN}/:path*`, 
       },
     ];
