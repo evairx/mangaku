@@ -40,7 +40,7 @@ export default async function handler(req, res) {
             const posterId = manga._id;
 
             try {
-                const posterResponse = await fetch(`${serverUrl}/static/api/poster/${posterId}`, {
+                const posterResponse = await fetch(`${serverUrl}/v1/api/poster/${posterId}`, {
                     headers: {
                         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMDc5NTczOSwiZXhwIjoxNzAzNDIzNzM5fQ.XxlDFjKvsKp3Pcp8uabPTivr9oN3-4JveXiFjCOLmGc'
                     }
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
                     }
                 } else {
                     const posterData = await posterResponse.json();
-                    manga.poster = `${serverUrl}/static/bucket/poster/${posterId}/${posterData.contents[0]}?a=${tokenImg}`;
+                    manga.poster = `${serverUrl}/v1/static/poster/${posterId}/${posterData.contents[0]}?a=${tokenImg}`;
                 }
             } catch (error) {
                 console.error('Error en la solicitud fetch:', error);

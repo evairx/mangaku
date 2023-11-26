@@ -104,7 +104,7 @@ const AddManga = ({ genres, format, status, url, token }) => {
   const uploadManga = async () => {
     if (filesToUpload.length > 0) {
       try {
-        const response = await fetch(`${url}/api/manga/upload`, {
+        const response = await fetch(`${url}/api/v1/manga/upload`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ const AddManga = ({ genres, format, status, url, token }) => {
     formData.append('file', file);
 
     try {
-      const uploadResponse = await fetch(`${url}/cdn/poster/${id}`, {
+      const uploadResponse = await fetch(`${url}/v1/poster/${id}`, {
         method: 'POST',
         body: formData,
         headers: {
