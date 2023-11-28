@@ -6,7 +6,7 @@ export default function GlobalStyles({theme}) {
       font-family: 'Inter';
       src: url(/fonts/Inter-400.woff2);
       font-weight: 400;
-      font-style: normal; /* o puedes omitir esta línea ya que 'normal' es el valor por defecto */
+      font-style: normal;
     }
     
     @font-face {
@@ -18,8 +18,20 @@ export default function GlobalStyles({theme}) {
 
     :root {
       --dark:#000;
-      --light:#eee;
-      --border: ${theme === "--dark" ? "#eee": "#000"};
+      --light:#fffff;
+      --border: ${theme === "--dark" ? "#eeee": "#000"};
+      --background-nav:${theme === "--dark" ? "#23252b": "#ffff"};
+      --main: ${theme === "--dark" ? "#ff3f3f": "#ff0a0a"};
+      --main-: ${theme === "--dark" ? "#1a1c20": "#eeee"};
+      --color: ${theme === "--dark" ? "#fff": "#000"};
+      --btn-hover: ${theme === "--dark" ? "#ffffff23": "#00000023"}; 
+      --helios-gradient-1:${theme === "--dark" ? "#00000036": "#ffffff36"};
+      --helios-gradient-2:${theme === "--dark" ? "#0000005d": "#ffffff5d"};
+      --helios-gradient-3:${theme === "--dark" ? "#000000": "#ffffff"};
+      --helios-gradient-1a:${theme === "--dark" ? "#0000002d": "#ffffff2d"};
+      --helios-gradient-2a:${theme === "--dark" ? "#0000008e": "#ffffff8e"};
+      --helios-gradient-3a:${theme === "--dark" ? "#000000c2": "#ffffffc2"};
+      
     }
 
     * {
@@ -31,7 +43,7 @@ export default function GlobalStyles({theme}) {
 
     body {
       background-color: var(${theme});
-      color:${theme === "--dark" ? "#eee": "#000"};
+      color:${theme === "--dark" ? "#ffff": "#000"};
     }
   `;
 

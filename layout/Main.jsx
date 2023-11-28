@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Nav from "@/src/components/nav";
 import Head from "next/head";
 import GlobalStyle from "@/src/global/style";
 import useDark from '@/src/hooks/useDark';
@@ -10,6 +11,10 @@ export default function Main({ children,  layout }) {
     useEffect(() => {
       setTheme(dark);
     }, [dark]);
+
+    const toggleDarkMode = () => {
+      setTheme(theme === '--dark' ? '--light' : '--dark');
+    };
 
     return (
       <>
@@ -39,6 +44,9 @@ export default function Main({ children,  layout }) {
               crossOrigin="anonymous"
           />
         </Head>
+        <header>
+          <Nav theme={theme} toggleDarkMode={toggleDarkMode}/>
+        </header>
         <main>
           {children}
         </main>

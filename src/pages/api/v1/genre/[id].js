@@ -1,13 +1,11 @@
 import Connect from "@/db/connect";
 import Genres from "@/models/Genres";
 import Manga from "@/models/Manga";
-import Format from '@/models/Format';
-import Status from '@/models/Status';
 import jwt from "jsonwebtoken"
 
 export default async function handler(req, res) {
     const { method, query: { id, page = 1 } } = req;
-    const itemsPerPage = 1; // Define el número de elementos por página
+    const itemsPerPage = 10;
 
     if (method === "GET") {
         await Connect();
@@ -22,10 +20,6 @@ export default async function handler(req, res) {
             const totalMangas = await Manga.countDocuments({ genres: { $in: id } });
             const totalPages = Math.ceil(totalMangas / itemsPerPage);
 
-            if (page < 1 || page > totalPages) {
-                return res.redirect(`/api/genre/${id}?page=${totalPages}`);
-            }
-
             const skipItems = (page - 1) * itemsPerPage;
             const mangas = await Manga.find({ genres: { $in: id } })
                 .skip(skipItems)
@@ -35,7 +29,8 @@ export default async function handler(req, res) {
                 return res.status(200).json({
                     page: parseInt(page),
                     totalPages,
-                    paginasDisponibles: [],
+                    genre: genres.name,
+                    content: [],
                 });
             }
 
@@ -80,6 +75,7 @@ export default async function handler(req, res) {
             return res.status(200).json({
                 page: parseInt(page),
                 totalPages,
+                genre: genres.name,
                 content: mappedMangas,
             });
         } catch (error) {

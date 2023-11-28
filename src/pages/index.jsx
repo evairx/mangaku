@@ -1,4 +1,5 @@
 import Layout from "@/layout/Main"
+import Carousel from "../components/carousel"
 
 export default function Home() {
   const layout = {
@@ -8,7 +9,7 @@ export default function Home() {
 
   return (
     <Layout layout={layout}>
-      <p>hola</p>
+      <Carousel/>
     </Layout>
   )
 }
