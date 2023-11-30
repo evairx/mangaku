@@ -1,19 +1,31 @@
 import { useState, useEffect } from "react";
 import Nav from "@/src/components/nav";
 import Head from "next/head";
-import GlobalStyle from "@/src/global/style";
-import useDark from '@/src/hooks/useDark';
+import GlobalStyle from "@/src/styles/style";
 
-export default function Main({ children,  layout }) {
-    const dark = useDark();
-    const [theme, setTheme] = useState(dark);
+export default function Main({ children, layout }) {
+    const isBrowser = typeof window !== 'undefined';
 
+    const savedTheme = isBrowser ? localStorage.getItem('theme') : null;
+
+    const initialTheme = savedTheme ? savedTheme : '--dark';
+
+    const [theme, setTheme] = useState(initialTheme);
+    
     useEffect(() => {
-      setTheme(dark);
-    }, [dark]);
+      if (isBrowser) {
+        localStorage.setItem('theme', theme);
+      }
+    }, [theme]);
 
     const toggleDarkMode = () => {
-      setTheme(theme === '--dark' ? '--light' : '--dark');
+      const currentTheme = isBrowser ? localStorage.getItem('theme') : null;
+
+      if (currentTheme === '--dark') {
+        setTheme('--light');
+      } else {
+        setTheme('--dark');
+      }
     };
 
     return (

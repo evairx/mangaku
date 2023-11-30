@@ -28,6 +28,10 @@ const MangaSchema = new Schema({
     type: String,
     required: true,
   },
+  views: {
+    type: Number,
+    default: 0,
+  },
   date: {
     type: Date,
     default: Date.now,

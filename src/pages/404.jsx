@@ -1,4 +1,4 @@
-import Layout from "@/layout/Main"
+import Layout from "@/layout/Error"
 import Image from "next/image"
 import styled from "@emotion/styled";
 

@@ -3,7 +3,7 @@ import Carousel from "../components/carousel"
 
 export default function Home() {
   const layout = {
-    title: 'xdsss',
+    title: 'Mangaku',
     description: '3'
   }
 
