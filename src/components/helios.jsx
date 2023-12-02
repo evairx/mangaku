@@ -33,7 +33,7 @@ const HeliosIndicator = styled.div`
 
   .helios-css42ww31f {
     width: 35px;
-    height: 10px;
+    height: 7px;
     border-radius: 8px;
     background-color: var(--color);
     opacity: 0.5;
@@ -41,6 +41,7 @@ const HeliosIndicator = styled.div`
     cursor: pointer;
     z-index: 2;
     transition: all 0.3s ease-out;
+    position: relative; // add this
 
     &:hover {
       opacity: 1;
@@ -51,13 +52,33 @@ const HeliosIndicator = styled.div`
       width: 30px;
       height: 8px;
     }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 8px;
+      background-color: #ff3f3f;
+      transition: width 0.3s ease-out;
+    }
   }
 
   .helios-css42ww31f.active {
     transition: all 0.3s ease-out;
     width: 65px;
-    background-color: #ff3f3f;
+    background-color:rgba(255, 255, 255, 0.497); 
     opacity: 1;
+    overflow:hidden;
+
+    &::before {
+      width: var(--progress); 
+    }
+
+    &:hover {
+      background-color: #ff3f3f;
+    }
   }
 `;
 
@@ -112,6 +133,7 @@ const HeliosItem =  styled.article`
 
 const Helios = ({ children }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
   const heliosRef = useRef(null);
   const isMobile = useQuery('(min-width: 680px)');
   const timerRef = useRef(null);
@@ -143,13 +165,21 @@ const Helios = ({ children }) => {
 
   const resetTimer = () => {
     clearInterval(timerRef.current);
+    setProgress(0);
     startTimer();
   };
 
   const startTimer = () => {
     timerRef.current = setInterval(() => {
-      nextSlide();
-    }, 15000);
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          nextSlide();
+          return 0;
+        } else {
+          return prevProgress + 100 / 15; // increment progress by 6.67
+        }
+      });
+    }, 1000); // set interval to 1 second
   };
 
   const nextSlide = () => {
@@ -203,6 +233,9 @@ const Helios = ({ children }) => {
             key={index}
             className={`helios-css42ww31f ${index === currentIndex ? 'active' : ''}`}
             onClick={() => goToSlide(index)}
+            style={{
+              '--progress': `${index === currentIndex ? `${progress}%` : '0%'}`, // set progress as a CSS variable
+            }}
           ></div>
         ))}
       </HeliosIndicator>
