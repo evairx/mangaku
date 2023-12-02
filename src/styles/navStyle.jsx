@@ -229,7 +229,7 @@ export const BackContainer = styled.div`
     transition: all .3s ease-out;
 
     &:hover {
-        background: #e5e5e553;
+        background:var(--btn-hover);
     }
 `
 
