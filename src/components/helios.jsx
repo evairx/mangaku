@@ -22,7 +22,7 @@ const HeliosStyle = styled.section`
 const HeliosIndicator = styled.div`
   position: absolute;
   bottom: 20px;
-  left: 178px;
+  left: 155px;
   transform: translateX(-50%);
   display: flex;
 
@@ -32,7 +32,7 @@ const HeliosIndicator = styled.div`
   }
 
   .helios-css42ww31f {
-    width: 35px;
+    width: 25px;
     height: 7px;
     border-radius: 8px;
     background-color: var(--color);
@@ -62,13 +62,14 @@ const HeliosIndicator = styled.div`
       border-radius: 8px;
       background-color: #ff3f3f;
       transition: width 0.3s ease-out;
+      
     }
   }
 
   .helios-css42ww31f.active {
     transition: all 0.3s ease-out;
-    width: 65px;
-    background-color:rgba(255, 255, 255, 0.497); 
+    width: 45px;
+    background-color:var(--helios-indicator-active); 
     opacity: 1;
     overflow:hidden;
 
@@ -77,7 +78,7 @@ const HeliosIndicator = styled.div`
     }
 
     &:hover {
-      background-color: #ff3f3f;
+      background-color: #ff3f3f7f;
     }
   }
 `;
@@ -176,10 +177,10 @@ const Helios = ({ children }) => {
           nextSlide();
           return 0;
         } else {
-          return prevProgress + 100 / 15; // increment progress by 6.67
+          return prevProgress + 1; 
         }
       });
-    }, 1000); // set interval to 1 second
+    }, 100);
   };
 
   const nextSlide = () => {
@@ -234,7 +235,7 @@ const Helios = ({ children }) => {
             className={`helios-css42ww31f ${index === currentIndex ? 'active' : ''}`}
             onClick={() => goToSlide(index)}
             style={{
-              '--progress': `${index === currentIndex ? `${progress}%` : '0%'}`, // set progress as a CSS variable
+              '--progress': `${index === currentIndex ? `${progress}%` : '0%'}`,
             }}
           ></div>
         ))}
