@@ -55,6 +55,13 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
         setOpenTheme(!openTheme)
     }
 
+    const [, , removeCookie] = useCookies(['token']);
+
+    function closeSession() {
+        removeCookie('token');
+        window.location.reload();
+    }
+
     return (
         <>
             <Style.Nav>
@@ -127,7 +134,6 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                                         <p>Invitado</p>
                                     </Style.UserContainerNav>
                                 }
-                                <Style.Border/>
                                 <Style.ButtonContainer>
                                     {user._id &&
                                     <Style.Button>
@@ -143,11 +149,19 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                                 <Style.Border/>
                                 <Style.ButtonContainer>
                                     {user._id ?
-                                        <Style.ButtonLogout>
+                                        <Style.ButtonLogout onClick={closeSession}>
                                            Cerrar Sesión
                                         </Style.ButtonLogout>
                                         :
-                                        <p>XD</p>
+                                        <div style={{marginTop: '1rem', width: '100%'}}>
+                                            <Style.ButtonLogin>
+                                                Iniciar Sesión
+                                            </Style.ButtonLogin>
+                                            <Style.BorderOr>o</Style.BorderOr>
+                                            <Style.ButtonLogin>
+                                                Crear Cuenta
+                                            </Style.ButtonLogin>
+                                        </div>
                                     }
                                 </Style.ButtonContainer>
                             </Style.ContainerUserNav>

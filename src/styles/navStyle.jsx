@@ -123,7 +123,7 @@ export const UserNav = styled.section`
     top: 3.5rem;
     background: var(--main-);
     width: 300px;
-    height: 300px;
+    min-height: 300px;
     right: 0;
     z-index: 999;
     border-radius:8px;
@@ -258,6 +258,46 @@ export const ButtonLogout = styled.button`
 
     &:hover {
         opacity: 1;
+    }
+`
+
+export const ButtonLogin = styled.button`
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.400rem;
+    font-size:1rem;
+    font-weight:400;
+    margin:.200rem;
+    background:none;
+    color:var(--color);
+    height:2.5rem;
+    cursor:pointer;
+    border:none;
+    text-align:center;
+    padding: 0rem 1rem;
+
+    &:hover {
+        background:var(--btn-hover);
+    }
+`
+
+export const BorderOr = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border);
+    }
+    &::before {
+        margin-right: 0.5em;
+    }
+    &::after {
+        margin-left: 0.5em;
     }
 `
 
