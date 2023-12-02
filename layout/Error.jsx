@@ -4,12 +4,19 @@ import GlobalStyle from "@/src/styles/style";
 import useDark from '@/src/hooks/useDark';
 
 export default function Main({ children,  layout }) {
-    const dark = useDark();
-    const [theme, setTheme] = useState(dark);
+  const dark = useDark();
+  const [theme, setTheme] = useState(dark);
 
-    useEffect(() => {
-      setTheme(dark);
-    }, [dark]);
+  useEffect(() => {
+      let initialTheme = localStorage.getItem('theme');
+      if (initialTheme === 'system') {
+          setTheme(dark);
+      } else if (initialTheme === 'dark'){
+          setTheme('--dark');
+      } else if (initialTheme === 'light'){
+          setTheme('--light');
+      }
+  }, [dark]);
 
     return (
       <>
