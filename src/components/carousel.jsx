@@ -39,7 +39,7 @@ const Info =  styled.article`
 `
 
 const Figure = styled.figure`
-  height: 100vh;
+  height: 100lvh;
   left: 50%;
   opacity: 1;
   position: absolute;

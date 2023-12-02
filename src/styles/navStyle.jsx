@@ -176,7 +176,7 @@ export const Button = styled.span`
     background:none;
     cursor:pointer;
     margin-bottom:.700rem;
-    transition: all .3s ease-out;
+
 
     &:hover {
         background:var(--btn-hover);
