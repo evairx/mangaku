@@ -7,7 +7,7 @@ import { createFormat } from "@/middleware/generate"
 import jwt from "jsonwebtoken"
 import UploadIcon from '@/src/icon/upload';
 import styled from '@emotion/styled';
-import Layout from "@/layout/Main"
+import Layout from "@/layout/Dash"
 import User from '@/models/User';
 
 const Container = styled.section`
@@ -297,9 +297,7 @@ export async function getServerSideProps(context) {
         props: {},
       };
     }
-  
-    console.log(userId)
-  
+      
     const url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `https://${req.headers.host}`;
   
     return {

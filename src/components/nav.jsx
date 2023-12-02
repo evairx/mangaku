@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useCookies } from 'react-cookie';
 import * as Style from "@/src/styles/navStyle"
 import useClick from "../hooks/useClick";
 import Bars from "../icon/bars";
@@ -7,12 +8,44 @@ import User from "@/src/icon/user"
 import Back from "@/src/icon/back"
 import Sun from "@/src/icon/sun";
 import Moon from "@/src/icon/moon";
+import SystemIco from '@/src/icon/systemIco'
 import Theme from "@/src/icon/theme"
 import SearchIco from "../icon/search";
 
-export default function Menu() {
+export default function Menu({ handleDark, handleLight, handleSystem }) {
+    const [user, setUser] = useState([]);
+    const [cookies] = useCookies(['token']);
     const [userRef, openUser, setOpenUser] = useClick(false);
     const [themeRef, openTheme, setOpenTheme] = useClick(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = cookies.token;
+    
+        if (token) {
+          fetch('/api/v1/user/account', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+          })
+          .then(data => {
+            setUser(data);
+            setLoggedIn(true);
+          })
+          .catch(error => {
+            console.error(error);
+            setLoggedIn(false);
+          });
+        } else {
+          // No hay token, redirigir a /login
+        }
+      }, []);
 
     function handleUser() {
         setOpenUser(!openUser)
@@ -38,9 +71,19 @@ export default function Menu() {
                             <SearchIco width={22} height={22}/>
                         </Style.SearchIcoContent>
                     </Style.SearchContainer>
-                    <Style.UserContent onClick={handleUser}>
-                        <User width={26} height={26}/>
-                    </Style.UserContent>
+                    {user._id ?
+                        <Style.UserAvatar onClick={handleUser}>
+                            {loggedIn &&
+                            <figure>
+                                {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`}/>}
+                            </figure>
+                            }
+                        </Style.UserAvatar>
+                        :
+                        <Style.UserContent onClick={handleUser}>
+                            <User width={26} height={26}/>
+                        </Style.UserContent>
+                    }
                     <Style.UserNav ref={userRef} openUser={openUser}>
                         {openTheme ?
                             <Style.ContainerUserNav ref={themeRef}>
@@ -50,19 +93,63 @@ export default function Menu() {
                                     </Style.BackContainer>
                                     <Style.Titletheme>Seleccionar Tema</Style.Titletheme>
                                 </Style.HeaderTheme>
+                                <div style={{marginTop: '1rem'}}>
+                                    <Style.ButtonThemes onClick={handleLight}>
+                                        <Sun width={24} height={24}/>
+                                        Claro
+                                    </Style.ButtonThemes>
+                                    <Style.ButtonThemes onClick={handleDark}>
+                                        <Moon width={24} height={24}/>
+                                        Oscuro
+                                    </Style.ButtonThemes>
+                                    <Style.ButtonThemes onClick={handleSystem}>
+                                        <SystemIco  width={24} height={24}/>
+                                        Sistema
+                                    </Style.ButtonThemes>
+                                </div>
                             </Style.ContainerUserNav>
                         :
                             <Style.ContainerUserNav>
-                                <Style.UserContainerNav>
-                                    <User width={42} height={42}/>
-                                    <p>Invitado</p>
-                                </Style.UserContainerNav>
+                                {user._id ?
+                                    <Style.UserContainerNav>
+                                    
+                                         {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} width={84} height={84} style={{borderRadius: '50%'}} alt={`avatar de ${user.username}`}/>}
+                                         <Style.UserName>
+                                            <p>{user?.username}</p>
+                                            <Style.Role>
+                                                {user?.roles[0] === "admin" && <span>{user?.roles[0]}</span>}
+                                            </Style.Role>
+                                         </Style.UserName>
+                                    </Style.UserContainerNav>
+                                :
+                                    <Style.UserContainerNav>
+                                        <User width={42} height={42}/>
+                                        <p>Invitado</p>
+                                    </Style.UserContainerNav>
+                                }
                                 <Style.Border/>
-                                <Style.ButtonTheme onClick={handleTheme}>
-                                    <Theme width={26} height={26}/>
-                                    Temas
-                                </Style.ButtonTheme>
+                                <Style.ButtonContainer>
+                                    {user._id &&
+                                    <Style.Button>
+                                        <User width={26} height={26}/>
+                                        Mi Cuenta
+                                    </Style.Button>
+                                    }
+                                    <Style.Button onClick={handleTheme}>
+                                        <Theme width={26} height={26}/>
+                                        Temas
+                                    </Style.Button>
+                                </Style.ButtonContainer>
                                 <Style.Border/>
+                                <Style.ButtonContainer>
+                                    {user._id ?
+                                        <Style.ButtonLogout>
+                                           Cerrar Sesión
+                                        </Style.ButtonLogout>
+                                        :
+                                        <p>XD</p>
+                                    }
+                                </Style.ButtonContainer>
                             </Style.ContainerUserNav>
                         }
                     </Style.UserNav>

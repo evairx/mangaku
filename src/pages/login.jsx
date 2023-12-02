@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Signin({ url }) {
+export default function Login({ url }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
@@ -8,7 +8,7 @@ export default function Signin({ url }) {
       e.preventDefault();
   
       try {
-        const response = await fetch(`${url}/api/user/signin`, {
+        const response = await fetch(`${url}/api/v1/user/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

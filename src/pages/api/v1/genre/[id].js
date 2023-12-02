@@ -36,8 +36,6 @@ export default async function handler(req, res) {
 
             const mappedMangas = await Promise.all(mangas.map(async (manga) => {
                 const serverUrl = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `http://${req.headers.host}`;
-                const expireDate = Math.floor(Date.now() / 1000) + 20;
-                const tokenImg = jwt.sign({ exp: expireDate }, process.env.SECRET);
                 const posterId = manga._id;
 
                 try {
@@ -58,7 +56,7 @@ export default async function handler(req, res) {
                         }
                     } else {
                         const posterData = await posterResponse.json();
-                        manga.poster = `${serverUrl}/v1/static/poster/${posterId}/${posterData.contents[0]}?a=${tokenImg}`;
+                        manga.poster = `${serverUrl}/v1/static/poster/${posterId}/${posterData.contents[0]}`;
                     }
                 } catch (error) {
                     console.error('Error en la solicitud fetch:', error);

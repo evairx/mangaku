@@ -26,18 +26,18 @@ export default function Main({ children,  layout }) {
             <link rel="manifest" href="/manifest.json" />
             <link
               rel="preload"
-              href="/fonts/Inter-400.woff2"
+              href="/fonts/inter-latin-400-normal.woff2"
               as="font"
               type="font/woff2"
               crossOrigin="anonymous"
-          />
-          <link
-              rel="preload"
-              href="/fonts/Inter-600.woff2"
-              as="font"
-              type="font/woff2"
-              crossOrigin="anonymous"
-          />
+            />
+            <link
+                rel="preload"
+                href="/fonts/inter-latin-600-normal.woff2"
+                as="font"
+                type="font/woff2"
+                crossOrigin="anonymous"
+            />
         </Head>
         <header>
           

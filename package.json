@@ -12,16 +12,17 @@
   "dependencies": {
     "next": "12.3.4",
     "react": "18",
+    "react-cookie": "^6.1.1",
     "react-dom": "18"
   },
   "devDependencies": {
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "argon2": "0.31.2",
+    "eslint": "8.54.0",
+    "eslint-config-next": "14.0.3",
     "jsonwebtoken": "9.0.2",
     "mongoose": "8.0.1",
-    "uuid": "9.0.1",
-    "eslint": "8.54.0",
-    "eslint-config-next": "14.0.3"
+    "uuid": "9.0.1"
   }
 }

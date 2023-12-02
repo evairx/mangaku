@@ -92,9 +92,29 @@ export const UserContent = styled.span`
     transition: all 0.2s ease-out;
     border: 2px solid var(--main-);
     color:var(--color);
+    overflow:hidden;
 
     &:hover {
         border: 2px solid var(--main);
+    }
+`;
+
+export const UserAvatar = styled.figure`
+    display: flex;
+    justify-content: center;
+    border-radius: 50%;
+    overflow:hidden;
+    width:42px;
+    height:42px;
+    cursor:pointer;
+    border: 2px solid transparent;
+
+    &:hover {
+        border: 2px solid var(--main);
+    }
+
+    img {
+        width:100%;
     }
 `;
 
@@ -106,7 +126,6 @@ export const UserNav = styled.section`
     height: 300px;
     right: 0;
     z-index: 999;
-    padding: 1rem;
     border-radius:8px;
     text-align:center;
     color:var(--color);
@@ -123,7 +142,27 @@ export const UserContainerNav = styled.section`
     }
 `
 
-export const ButtonTheme = styled.span`
+export const UserName = styled.div`
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:.400rem;
+    margin-top:.400rem;
+`
+
+export const Role = styled.div`
+    background:#fc1818b8;
+    padding: .100rem .500rem;
+    border-radius:2px;
+    color:#fff;
+`
+
+export const ButtonContainer = styled.div`
+    display:flex;
+    gap:.400rem;
+`
+
+export const Button = styled.span`
     margin-top:.600rem;
     width:100%;
     font-size:1.1rem;
@@ -132,12 +171,12 @@ export const ButtonTheme = styled.span`
     align-items: center;
     height:2.5rem;
     border:none;
-    border-radius:8px;
     gap:.200rem;
     color:var(--color);
     background:none;
     cursor:pointer;
     margin-bottom:.700rem;
+    transition: all .3s ease-out;
 
     &:hover {
         background:var(--btn-hover);
@@ -145,10 +184,32 @@ export const ButtonTheme = styled.span`
 
 `
 
+export const ButtonThemes = styled.button`
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:.400rem;
+    font-size:1rem;
+    font-weight:400;
+    margin:.200rem;
+    background:none;
+    color:var(--color);
+    height:2.5rem;
+    cursor:pointer;
+    border:none;
+    text-align:left;
+    padding: 0rem 1rem;
+
+    &:hover {
+        background:var(--btn-hover);
+    }
+`
+
 export const ContainerUserNav = styled.div`
     width:100%;
     height:100%;
     position:relative;
+    padding: 1rem;
 `
 
 export const HeaderTheme = styled.div`
@@ -176,6 +237,28 @@ export const Titletheme = styled.p`
     margin-top:.200rem;
     font-size:1.050rem;
     font-weight:600;
+`
+
+export const ButtonLogout = styled.button`
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:.400rem;
+    background:var(--main);
+    color:#fff;
+    width:100%;
+    margin-top:1rem;
+    font-size:1.150rem;
+    border:none;
+    padding: .400rem;
+    border-radius:2px;
+    font-weight:600;
+
+    opacity: 0.8;
+
+    &:hover {
+        opacity: 1;
+    }
 `
 
 export const Border = styled.div`
