@@ -117,7 +117,7 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                             </Style.ContainerUserNav>
                         :
                             <Style.ContainerUserNav>
-                                {user._id ?
+                                {user._id &&
                                     <Style.UserContainerNav>
                                     
                                          {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} width={84} height={84} style={{borderRadius: '50%'}} alt={`avatar de ${user.username}`}/>}
@@ -127,11 +127,6 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                                                 {user?.roles[0] === "admin" && <span>{user?.roles[0]}</span>}
                                             </Style.Role>
                                          </Style.UserName>
-                                    </Style.UserContainerNav>
-                                :
-                                    <Style.UserContainerNav>
-                                        <User width={42} height={42}/>
-                                        <p>Invitado</p>
                                     </Style.UserContainerNav>
                                 }
                                 <Style.ButtonContainer>

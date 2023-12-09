@@ -19,7 +19,7 @@ const HeliosStyle = styled.section`
   }
 `;
 
-const HeliosIndicator = styled.div`
+const HeliosIndicator = styled.section`
   position: absolute;
   bottom: 20px;
   left: 155px;
@@ -30,58 +30,57 @@ const HeliosIndicator = styled.div`
     left: 50%;
     bottom: 10px;
   }
+`;
 
-  .helios-css42ww31f {
-    width: 25px;
-    height: 7px;
-    border-radius: 8px;
-    background-color: var(--color);
-    opacity: 0.5;
-    margin: 0 5px;
-    cursor: pointer;
-    z-index: 2;
-    transition: all 0.3s ease-out;
-    position: relative; // add this
+const HeliosPage = styled.span`
+  width: 25px;
+  height: 7px;
+  border-radius: 8px;
+  background-color: var(--color);
+  opacity: 0.5;
+  margin: 0 5px;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease-out;
+  position: relative; // add this
 
-    &:hover {
-      opacity: 1;
-      background-color: #ff3f3f;
-    }
-
-    @media screen and (max-width: 680px) {
-      width: 30px;
-      height: 8px;
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      border-radius: 8px;
-      background-color: #ff3f3f;
-      transition: width 0.3s ease-out;
-      
-    }
+  &:hover {
+    opacity: 1;
+    background-color: #ff3f3f;
   }
 
-  .helios-css42ww31f.active {
+  @media screen and (max-width: 680px) {
+    width: 30px;
+    height: 8px;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 8px;
+    background-color: #ff3f3f;
+    transition: width 0.3s ease-out;
+  }
+
+  &.active {
     transition: all 0.3s ease-out;
     width: 45px;
     background-color:var(--helios-indicator-active); 
     opacity: 1;
     overflow:hidden;
 
-    &::before {
-      width: var(--progress); 
+    &::before { 
+      width: ${props => props.loaderPagee};
     }
 
     &:hover {
       background-color: #ff3f3f7f;
     }
   }
-`;
+`
 
 const Prev = styled.button`
   position: absolute;
@@ -129,6 +128,8 @@ const HeliosInner = styled.main`
 const HeliosItem =  styled.article`
   min-width: 100%;
   box-sizing: border-box;
+  opacity: ${props => props.opacityProps};
+  transform: ${props => props.transformProps};
   transition: opacity .5s ease-in-out;
 `
 
@@ -183,6 +184,7 @@ const Helios = ({ children }) => {
     }, 100);
   };
 
+
   const nextSlide = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === children.length - 1 ? 0 : prevIndex + 1
@@ -202,17 +204,15 @@ const Helios = ({ children }) => {
     resetTimer();
   };
 
+
   return (
     <HeliosStyle ref={heliosRef}>
       <HeliosInner>
         {React.Children.map(children, (child, index) => (
-          <HeliosItem
+          <HeliosItem 
+            opacityProps={index === currentIndex ? '1' : '0.4'}
+            transformProps={`translateX(-${currentIndex * 100}%)`}
             key={index}
-            className={`${index === currentIndex ? 'active' : ''}`}
-            style={{
-              opacity: index === currentIndex ? 1 : 0.2,
-              transform: `translateX(-${currentIndex * 100}%)`,
-            }}
           >
             {child}
           </HeliosItem>
@@ -230,14 +230,11 @@ const Helios = ({ children }) => {
       )}
       <HeliosIndicator>
         {React.Children.map(children, (_, index) => (
-          <div
+          <HeliosPage loaderPagee={`${index === currentIndex ? `${progress}%` : '0%'}`}
             key={index}
-            className={`helios-css42ww31f ${index === currentIndex ? 'active' : ''}`}
+            className={`${index === currentIndex ? 'active' : ''}`}
             onClick={() => goToSlide(index)}
-            style={{
-              '--progress': `${index === currentIndex ? `${progress}%` : '0%'}`,
-            }}
-          ></div>
+          />
         ))}
       </HeliosIndicator>
     </HeliosStyle>

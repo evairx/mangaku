@@ -54,7 +54,7 @@ export const Search = styled.input`
     border-radius: 8px;
     padding: 0rem 1rem;
     border: none;
-    background-color: #33333393;
+    background-color: var(--usernav);
     backdrop-filter:blur(20px);
     outline: none;
     font-size:1rem;
@@ -85,12 +85,13 @@ export const UserContent = styled.span`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--main-);
+    background-color: var(--usernav);
+    backdrop-filter:blur(20px);
     border-radius: 50%;
     padding: 0.300rem;
     cursor: pointer;
     transition: all 0.2s ease-out;
-    border: 2px solid var(--main-);
+    border: 2px solid var(--usernav);
     color:var(--color);
     overflow:hidden;
 
@@ -121,9 +122,10 @@ export const UserAvatar = styled.figure`
 export const UserNav = styled.section`
     position: absolute;
     top: 3.5rem;
-    background: var(--main-);
+    background-color: var(--usernav);
+    backdrop-filter:blur(20px);
     width: 300px;
-    min-height: 300px;
+    min-height: 200px;
     right: 0;
     z-index: 999;
     border-radius:8px;
