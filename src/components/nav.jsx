@@ -17,11 +17,15 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
     const [cookies] = useCookies(['token']);
     const [userRef, openUser, setOpenUser] = useClick(false);
     const [themeRef, openTheme, setOpenTheme] = useClick(false);
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const token = cookies.token;
-    
+
+        if (!token) {
+            setLoading(false);
+        }
+
         if (token) {
           fetch('/api/v1/user/account', {
             headers: {
@@ -36,11 +40,11 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
           })
           .then(data => {
             setUser(data);
-            setLoggedIn(true);
+            setLoading(false);
           })
           .catch(error => {
             console.error(error);
-            setLoggedIn(false);
+            setLoading(true);
           });
         } else {
           // No hay token, redirigir a /login
@@ -78,18 +82,22 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                             <SearchIco width={22} height={22}/>
                         </Style.SearchIcoContent>
                     </Style.SearchContainer>
-                    {user._id ?
-                        <Style.UserAvatar onClick={handleUser}>
-                            {loggedIn &&
-                            <figure>
-                                {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`}/>}
-                            </figure>
-                            }
-                        </Style.UserAvatar>
+                    {loading ?
+                        <Style.UserLoading/>
                         :
-                        <Style.UserContent onClick={handleUser}>
-                            <User width={26} height={26}/>
-                        </Style.UserContent>
+                        <>
+                            {user._id ?
+                            <Style.UserAvatar onClick={handleUser}>
+                                <figure>
+                                    {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`}/>}
+                                </figure>
+                            </Style.UserAvatar>
+                            :
+                            <Style.UserContent onClick={handleUser}>
+                                <User width={26} height={26}/>
+                            </Style.UserContent>
+                            }
+                        </>
                     }
                     <Style.UserNav ref={userRef} openUser={openUser}>
                         {openTheme ?
@@ -144,18 +152,18 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                                 <Style.Border/>
                                 <Style.ButtonContainer>
                                     {user._id ?
-                                        <Style.ButtonLogout onClick={closeSession}>
+                                        <Style.ButtonX style={{marginTop: '1rem'}} onClick={closeSession}>
                                            Cerrar Sesión
-                                        </Style.ButtonLogout>
+                                        </Style.ButtonX>
                                         :
                                         <div style={{marginTop: '1rem', width: '100%'}}>
-                                            <Style.ButtonLogin>
+                                            <Style.ButtonX>
                                                 Iniciar Sesión
-                                            </Style.ButtonLogin>
+                                            </Style.ButtonX>
                                             <Style.BorderOr>o</Style.BorderOr>
-                                            <Style.ButtonLogin>
+                                            <Style.ButtonX>
                                                 Crear Cuenta
-                                            </Style.ButtonLogin>
+                                            </Style.ButtonX>
                                         </div>
                                     }
                                 </Style.ButtonContainer>

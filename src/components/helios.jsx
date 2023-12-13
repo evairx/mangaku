@@ -204,7 +204,6 @@ const Helios = ({ children }) => {
     resetTimer();
   };
 
-
   return (
     <HeliosStyle ref={heliosRef}>
       <HeliosInner>

@@ -2,6 +2,9 @@ import React , { useState, useEffect }from 'react'
 import Helios from "./helios"
 import styled from '@emotion/styled';
 import useQuery from "@/src/hooks/useQuery"
+import HeliosLeft from "@/src/icon/HeliosLeft"
+import HeliosRight from "@/src/icon/HeliosRight"
+import Link from 'next/link';
 
 const Container = styled.main` 
   position: relative;
@@ -21,6 +24,66 @@ const Container = styled.main`
     background: linear-gradient(rgba(0, 0, 0, 0), #00000075, #000000b7, #000000);
     height: 170vw;
   }
+`
+
+const ContainerLoading = styled.main`
+  position: relative;
+  overflow: hidden;
+  height: 75vh;
+  animation: skeleton-loadings .8s linear infinite alternate;
+
+  @keyframes skeleton-loadings {
+    0% {
+      background-color: var(--skeleton-color);
+      opacity: 0.2;
+    }
+
+    100% {
+      background-color: var(--skeleton-color-100);
+      opacity: 0.3;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.541), #000000a4,#000000dc, #000000);
+  }
+  
+  @media screen and (max-width: 550px) {
+    height: 100vw;
+  }
+
+  @media screen and (max-width: 485px) {
+    background: linear-gradient(rgba(0, 0, 0, 0), #00000075, #000000b7, #000000);
+    height: 170vw;
+  }
+`
+
+const Prev = styled.button`
+  position: absolute;
+  border:none;
+  background:none;
+  top: 50%;
+  color:var(--color);
+  border: none;
+  cursor: normal;
+  left:20px;
+  z-index: 1;
+  opacity:0.5;
+  transition: all .3s ease-out;
+`
+
+const Next = styled.button`
+  position: absolute;
+  top: 50%;
+  color:var(--color);
+  border:none;
+  background:none;
+  border: none;
+  cursor: normal;
+  right:20px;
+  z-index: 1;
+  opacity:0.5;
+  transition: all .3s ease-out;
 `
 
 const Info =  styled.article`
@@ -138,7 +201,7 @@ const ImageLoading = styled.div`
   animation: skeleton-loading .5s linear infinite alternate;
   width: 282px;
   height: 150px;
-  background-color: hsla(199, 20%, 70%, 0.288);
+  background-color: var(--skeleton-color);
   margin-top:1rem;
 `
 
@@ -151,7 +214,7 @@ const TextLoading = styled.div`
     height: 17px;
     width: 100%;
     margin-bottom: 5px;
-    background-color: hsla(199, 20%, 70%, 0.288);
+    background-color: var(--skeleton-color);
     animation: skeleton-loading .5s linear infinite alternate;
 
     &:last-child {
@@ -166,16 +229,16 @@ const ButtonLoading = styled.div`
   animation: skeleton-loading .5s linear infinite alternate;
   width: 232px;
   height: 53px;
-  background-color: hsla(199, 20%, 70%, 0.288);
+  background-color: var(--skeleton-color);
   margin-top:1rem;
 
   @keyframes skeleton-loading {
     0% {
-      background-color: hsla(199, 20%, 70%, 0.288);
+      background-color: var(--skeleton-color);
     }
 
     100% {
-      background-color: hsla(204, 20%, 95%, 0.685);
+      background-color: var(--skeleton-color-100);
     }
   }
 `
@@ -198,73 +261,70 @@ const Logo = styled.figure`
 function Carousel() {
   const isWidth = useQuery('(min-width: 1001px)');
   const isMobile = useQuery('(min-width: 485px)');
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [mangas, setMangas] = useState([]);
 
   useEffect(() => {
-    const fakeFontLoadingTime = 1000;
-    
-    const timer = setTimeout(() => {
-      setFontsLoaded(true);
-    }, fakeFontLoadingTime);
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/v1/popular");
 
-    return () => clearTimeout(timer);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setMangas(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(true);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const mangas = [
-    {
-      title: "Solo Leveling",
-      poster: "e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.512.webp",
-      synopsis: "En un mundo en el que seres despiertos llamados 'Cazadores' deben luchar contra monstruos mortales para proteger a la humanidad, Sung Jinwoo, apodado 'el cazador más débil de toda la humanidad', se encuentra en una lucha constante por la supervivencia. Un día, tras un brutal encuentro en una mazmorra sobrepotenciada que aniquila a su grupo y amenaza con acabar con su vida, un misterioso Sistema le elige como único jugador: A Jinwoo se le ha concedido la rara oportunidad de subir de nivel sus habilidades, posiblemente más allá de cualquier límite conocido. Sigue el viaje de Jinwoo mientras se enfrenta a enemigos cada vez más fuertes, tanto humanos como monstruos, para descubrir los secretos de las profundidades de las mazmorras y el alcance definitivo de sus poderes.",
-      logo: "Solo_Leveling.webp",
-      background: "b6e07b80-e5a7-48c6-8919-0aa7c3e70abb.webp"
-    },
-    {
-      title: "Jujutsu Kaisen",
-      poster: "a1eecd65-0cd9-4a6f-86a8-f1bb44c6310b.jpg.512.webp",
-      synopsis: "Aunque Yuji Itadori parece un adolescente normal y corriente, ¡su inmensa fuerza física es algo digno de contemplar! Todos los clubes deportivos quieren que se una a ellos, pero Itadori prefiere pasar el rato con los marginados del Club de Investigación Oculta. Un día, el club consigue hacerse con un objeto maldito sellado. No se imaginan el terror que desatarán cuando rompan el sello...",
-      logo: "jujutsu.webp",
-      background: "b4e07b80-e5a7-48c6-8919-0aa7c3e70abb.webp"
-    },
-    {
-      title: "Rent-a-Girlfriend",
-      poster: "090867df-a911-453e-817d-37bd322f84ae.jpg.512.webp",
-      synopsis: "Kinoshita Kazuya es un estudiante universitario fracasado de 20 años. Consiguió besar a su novia una vez, pero le dejaron al cabo de un mes. 'Ugh... Maldita sea. No quiero volver a pasar por eso'.Completamente rencoroso, Kazuya utiliza cierto método para salir con una chica. Va a su lugar de encuentro y de repente oye: 'Eres Kazuya-kun, ¿verdad?'. Una hermosa chica que peinaba su largo pelo negro detrás de la oreja estaba allí, sonriéndole. Se llamaba Mizuhara Chizuru. ¡Algo real nace después de un simple alquiler! ¡Una temeraria comedia romántica llena de amor y emoción está a punto de comenzar!",
-      logo: "rent-a-girlfriend.webp",
-      background: "b89e07b80-e5a7-48c6-8919-0aa7c3e70abb.webp"
-    },
-    {
-      title: "Sometimes Even Reality Is a Lie!",
-      poster: "9e1fdcf5-6c82-409c-a04b-0b3169cdea54.jpg.512.jpg",
-      synopsis: "Kinoshita Kazuya es un estudiante universitario fracasado de 20 años. Consiguió besar a su novia una vez, pero le dejaron al cabo de un mes. 'Ugh... Maldita sea. No quiero volver a pasar por eso'.Completamente rencoroso, Kazuya utiliza cierto método para salir con una chica. Va a su lugar de encuentro y de repente oye: 'Eres Kazuya-kun, ¿verdad?'. Una hermosa chica que peinaba su largo pelo negro detrás de la oreja estaba allí, sonriéndole. Se llamaba Mizuhara Chizuru. ¡Algo real nace después de un simple alquiler! ¡Una temeraria comedia romántica llena de amor y emoción está a punto de comenzar!",
-      logo: "",
-      background: "aa7d7njb2rm4xhdhqwx33wivf4.webp"
-    }
-  ]
-
   return (
-      <Helios>
+        <>
+        {loading ?
+        <ContainerLoading>
+          <Info>
+            <ImageLoading/>
+            {isWidth &&
+            <TextLoading>
+              <div className='css-bdVaJa'/>
+              <div className='css-bdVaJa'/>
+              <div className='css-bdVaJa'/>
+              <div className='css-bdVaJa'/>
+            </TextLoading>}
+            <div>
+              <ButtonLoading/>
+            </div>
+          </Info>
+          {isMobile && (
+            <>
+              <Prev type="button" aria-label="Anterior Articulo">
+                <HeliosLeft />
+              </Prev>
+              <Next type="button" aria-label="Siguiente Articulo">
+                <HeliosRight />
+              </Next>
+            </>
+          )}
+        </ContainerLoading>:
+        <Helios>
         {mangas.map((manga, index) => (
           <Container key={index}>
             <Info>
-              {fontsLoaded ? <Logo style={!manga.logo ? { width: "170px", height: "240px", marginBottom: '20px', boxShadow: '0px 0px 15px 5px rgba(0,0,0,0.43)' } : {}}>
+              <Link href={`/view/${manga.slug}`}><Logo style={!manga.logo ? { width: "170px", height: "240px", marginBottom: '20px', boxShadow: '0px 0px 15px 5px rgba(0,0,0,0.43)' } : {}}>
                 <picture>
                   <img loading="lazy" src={manga.logo ? manga.logo : manga.poster} alt={manga.title}/>
                 </picture>
-              </Logo>: <ImageLoading/>}
-              {fontsLoaded ? (
-                isWidth && <Text>{manga.synopsis}</Text>
-                ):(
-                isWidth &&
-                  <TextLoading>
-                    <div className='css-bdVaJa'/>
-                    <div className='css-bdVaJa'/>
-                    <div className='css-bdVaJa'/>
-                    <div className='css-bdVaJa'/>
-                  </TextLoading>
-                )
-              }
+              </Logo></Link>
+                {isWidth && <Text>{manga.overview}</Text>}
               <div>
-              {fontsLoaded ? <Button>Empezar a leer</Button>:<ButtonLoading/>}
+              <Button>Empezar a leer</Button>
               </div>
             </Info>
             <Figure>
@@ -282,7 +342,8 @@ function Carousel() {
             </Figure>
           </Container>
         ))}
-      </Helios>
+       </Helios>}
+       </>
   );
 }
 

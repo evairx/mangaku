@@ -76,6 +76,8 @@ const AddManga = ({ genres, format, status, url, token }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
+    titleJp: '',
+    author: '',
     overview: '',
     format: '',
     genres: [],
@@ -83,10 +85,14 @@ const AddManga = ({ genres, format, status, url, token }) => {
   });
   const [selectedGenres, setSelectedGenres] = useState([]);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event, index) => {
     const selectedFiles = event.target.files;
-    setFilesToUpload(selectedFiles);
-
+    setFilesToUpload((prevFiles) => {
+      const updatedFiles = [...prevFiles];
+      updatedFiles[index] = Array.from(selectedFiles);
+      return updatedFiles;
+    });
+  
     const statusElement = document.getElementById('status');
     const fileCount = selectedFiles.length;
     statusElement.innerText =
@@ -121,8 +127,13 @@ const AddManga = ({ genres, format, status, url, token }) => {
           console.log('Primer POST exitoso. ID:', id);
   
           const filesArray = Array.from(filesToUpload);
-          filesArray.forEach((file) => uploadPoster(file, id));
-  
+
+          const imageTypes = ['poster', 'logo', 'background'];
+
+          filesToUpload.forEach((files, index) => {
+            files.forEach((file) => uploadImage(file, id, imageTypes[index]));
+          });
+
           setFilesToUpload([]);
         } else {
           console.error('Error en el primer POST');
@@ -135,25 +146,25 @@ const AddManga = ({ genres, format, status, url, token }) => {
     }
   };
 
-  const uploadPoster = async (file, id) => {
-    console.log('Cargando archivo:', file.name);
+  const uploadImage = async (file, id, imageType) => {
+    console.log(`Cargando archivo ${imageType}:`, file.name);
 
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const uploadResponse = await fetch(`${url}/v1/poster/${id}`, {
+      const uploadResponse = await fetch(`${url}/v1/${imageType}/${id}`, {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
       });
 
       if (uploadResponse.ok) {
-        console.log('Segundo POST exitoso para el archivo:', file.name);
+        console.log(`Segundo POST exitoso para el archivo ${imageType}:`, file.name);
       } else {
-        console.error('Error en el segundo POST para el archivo:', file.name);
+        console.error(`Error en el segundo POST para el archivo ${imageType}:`, file.name);
       }
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -177,18 +188,48 @@ const AddManga = ({ genres, format, status, url, token }) => {
     <Layout layout={layout}>
       <Container>
         <ContainerDrop>
+        <Drop>
+            <StyledInput
+              type="file"
+              id="file"
+              name="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, 0)}
+            />
+            <div>
+              <UploadIcon width={34} height={34} />
+            </div>
+            <label htmlFor="files">Seleccionar Poster</label>
+            <p id="status"></p>
+          </Drop>
+
           <Drop>
             <StyledInput
               type="file"
               id="file"
               name="file"
               accept="image/*"
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e, 1)}
             />
             <div>
-              <UploadIcon width={34} height={34}/>
+              <UploadIcon width={34} height={34} />
             </div>
-            <label htmlFor="files">Seleccionar Poster</label>
+            <label htmlFor="files">Seleccionar Logo</label>
+            <p id="status"></p>
+          </Drop>
+
+          <Drop>
+            <StyledInput
+              type="file"
+              id="file"
+              name="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, 2)}
+            />
+            <div>
+              <UploadIcon width={34} height={34} />
+            </div>
+            <label htmlFor="files">Seleccionar Background</label>
             <p id="status"></p>
           </Drop>
         </ContainerDrop>
@@ -197,14 +238,28 @@ const AddManga = ({ genres, format, status, url, token }) => {
           <input
             type="text"
             name="title"
-            placeholder="Title"
+            placeholder="Titulo"
             value={formData.title}
             onChange={handleInputChange}
           />
           <input
             type="text"
+            name="titleJp"
+            placeholder="Titulo Japones"
+            value={formData.titleJp}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="author"
+            placeholder="Autor"
+            value={formData.author}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
             name="overview"
-            placeholder="Overview"
+            placeholder="Descripcion"
             value={formData.overview}
             onChange={handleInputChange}
           />

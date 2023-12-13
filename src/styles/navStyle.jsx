@@ -119,6 +119,28 @@ export const UserAvatar = styled.figure`
     }
 `;
 
+export const UserLoading = styled.div`
+    display: flex;
+    justify-content: center;
+    border-radius: 50%;
+    overflow:hidden;
+    background-color: var(--skeleton-color);
+    animation: skeleton-loading .5s linear infinite alternate;
+    opacity: 0.7;
+    width:42px;
+    height:42px;
+
+    @keyframes skeleton-loading {
+        0% {
+            background-color: var(--skeleton-color);
+        }
+
+        100% {
+            background-color: var(--skeleton-color-100);
+        }
+    }
+`
+
 export const UserNav = styled.section`
     position: absolute;
     top: 3.5rem;
@@ -241,29 +263,7 @@ export const Titletheme = styled.p`
     font-weight:600;
 `
 
-export const ButtonLogout = styled.button`
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:.400rem;
-    background:var(--main);
-    color:#fff;
-    width:100%;
-    margin-top:1rem;
-    font-size:1.150rem;
-    border:none;
-    padding: .400rem;
-    border-radius:2px;
-    font-weight:600;
-
-    opacity: 0.8;
-
-    &:hover {
-        opacity: 1;
-    }
-`
-
-export const ButtonLogin = styled.button`
+export const ButtonX = styled.button`
     width:100%;
     display:flex;
     align-items:center;

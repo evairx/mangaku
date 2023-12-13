@@ -27,6 +27,8 @@ export default function GlobalStyles({theme}) {
       --usernav: ${theme === "--dark" ? "#33333393": "#ffffff58"};
       --color-2: ${theme === "--dark" ? "#000": "#fff"};
       --btn-hover: ${theme === "--dark" ? "#ffffff23": "#00000023"}; 
+      --skeleton-color: ${theme === "--dark" ? "hsla(199, 20%, 70%, 0.288)": "hsla(195, 6%, 25%, 0.288)"};
+      --skeleton-color-100: ${theme === "--dark" ? "hsla(204, 20%, 95%, 0.685)": "hsla(210, 3%, 25%, 0.685)"};
       --helios-indicator-active: ${theme === "--dark" ? "rgba(255, 255, 255, 0.497)": "rgba(0, 0, 0, 0.497)"};
       --helios-gradient-1:${theme === "--dark" ? "#00000036": "#ffffff36"};
       --helios-gradient-2:${theme === "--dark" ? "#0000005d": "#ffffff5d"};
