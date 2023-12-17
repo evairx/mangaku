@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Manga/";
 import Genres from '@/models/Genres';
 import Format from '@/models/Format';
 import Status from '@/models/Status';
@@ -11,24 +11,14 @@ export default async function handler(req, res) {
     if (method === "GET") {
         await Connect();
 
-        const currentDate = new Date();
-        const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-        const mangas = await Manga.find({
-            date: {
-                $gte: startOfWeek,
-                $lte: endOfWeek
-            }
-        }).sort({ views: -1 }).limit(5);
+        const mangas = await Manga.find().sort({ views: -1 }).limit(5);
 
         if (mangas.length === 0) {
             res.status(200).json([]);
             return;
         }
 
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMDc5NTczOSwiZXhwIjoxNzAzNDIzNzM5fQ.XxlDFjKvsKp3Pcp8uabPTivr9oN3-4JveXiFjCOLmGc";
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMjc4MDcxN30.8nm2Ei5o-y9B9AbM1B-t46K3ov_hd1hcyJufnjG50y8";
 
         const mappedMangas = mangas.map(async (manga) => {
             const formatId = manga.format;

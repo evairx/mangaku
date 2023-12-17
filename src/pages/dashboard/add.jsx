@@ -11,7 +11,7 @@ import Layout from "@/layout/Dash"
 import User from '@/models/User';
 
 const Container = styled.section`
-  /* Tu estilo aquí */
+
 `
 
 const ContainerDrop = styled.article`
@@ -59,6 +59,17 @@ const CheckboxLabel = styled.label`
   gap:.200rem;
 `;
 
+const Header = styled.main`
+  width:100%;
+  background-color: var(--background-nav);
+  padding:.400rem;
+  height:3rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-radius: 5px;
+`
+
 const Checkbox = ({ label, value, onChange }) => {
   return (
       <CheckboxLabel>
@@ -81,9 +92,19 @@ const AddManga = ({ genres, format, status, url, token }) => {
     overview: '',
     format: '',
     genres: [],
-    status: ''
+    status: '',
+    nsfw: false,
   });
   const [selectedGenres, setSelectedGenres] = useState([]);
+
+  const handleNsfwChange = (event) => {
+    const { checked } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      nsfw: checked,
+    }));
+  };
+
 
   const handleFileChange = (event, index) => {
     const selectedFiles = event.target.files;
@@ -179,6 +200,11 @@ const AddManga = ({ genres, format, status, url, token }) => {
     }
   };
 
+  useEffect(() => {
+    // Aquí puedes realizar cualquier acción adicional cuando nsfw cambie
+    console.log('Valor de nsfw actualizado:', formData.nsfw);
+  }, [formData.nsfw]);
+
   const layout = {
     title: 'xdsss',
     description: '3'
@@ -186,6 +212,11 @@ const AddManga = ({ genres, format, status, url, token }) => {
 
   return (
     <Layout layout={layout}>
+      <Header>
+        <p>volver</p>
+        <h1>Agregar</h1>
+        <button onClick={uploadManga}>Subir</button>
+      </Header>
       <Container>
         <ContainerDrop>
         <Drop>
@@ -265,6 +296,13 @@ const AddManga = ({ genres, format, status, url, token }) => {
           />
           <br></br>
 
+          NSFW:
+          <input
+            type="checkbox"
+            checked={formData.nsfw}
+            onChange={handleNsfwChange}
+          />
+
           <select
             name="format"
             value={formData.format}
@@ -275,6 +313,7 @@ const AddManga = ({ genres, format, status, url, token }) => {
               <option value={format._id} key={index}>{format.name}</option>
             ))}
           </select>
+          
 
           <select
             name="status"
@@ -292,7 +331,6 @@ const AddManga = ({ genres, format, status, url, token }) => {
               <Checkbox key={index} label={genre.name} value={genre._id} onChange={handleCheckboxChange} />
             ))}
           </CheckboxSection>
-          <button onClick={uploadManga}>Subir Imágenes y Datos</button>
         </section>
       </Container>
     </Layout>

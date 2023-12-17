@@ -9,6 +9,13 @@ const Container = styled.section`
     display:flex;
     gap:1rem;
     padding:1rem;
+
+    
+    @media screen and (max-width: 952px) {
+      display:initial;
+      gap:0rem;
+      padding:0rem;
+  }
 `
 
 export default function Main({ children,  layout }) {

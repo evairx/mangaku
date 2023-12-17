@@ -20,7 +20,8 @@ export default function GlobalStyles({theme}) {
       --dark:#000;
       --light:#fffff;
       --border: ${theme === "--dark" ? "#eeeeee68": "#00000068"};
-      --background-nav:${theme === "--dark" ? "#23252b": "#ffff"};
+      --background-nav:${theme === "--dark" ? "#17181c": "#ffff"};
+      --loader-bars: ${theme === "--dark" ? "rgba(255, 255, 255, 0.5)": "rgba(8, 7, 7, 0.5)"};
       --main: ${theme === "--dark" ? "#ff3f3f": "#ff0a0a"};
       --main-: ${theme === "--dark" ? "#1a1c20": "#fff"};
       --color: ${theme === "--dark" ? "#fff": "#000"};

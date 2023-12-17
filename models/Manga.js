@@ -13,7 +13,7 @@ const MangaSchema = new Schema({
   },
   titleJp: {
     type: String,
-    required: true,
+    required: false,
   },
   titleslug: {
     type: String
@@ -25,16 +25,6 @@ const MangaSchema = new Schema({
   format: {
     type: String,
     required: true,
-  },
-  like: {
-    type: Number,
-    required: false,
-    default:0,
-  },
-  dislike: {
-    type: Number,
-    required: false,
-    default:0,
   },
   author: {
     type: String,
@@ -53,6 +43,9 @@ const MangaSchema = new Schema({
   views: {
     type: Number,
     default: 0,
+  },
+  nsfw: {
+    type: Boolean,
   },
   date: {
     type: Date,

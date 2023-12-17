@@ -16,6 +16,11 @@ const Nav = styled.nav`
     }
 `
 
+const Header = styled.main`
+    display:flex;
+    gap:.400rem;
+`
+
 export default function NavDash() {
     const [user, setUser] = useState([]);
     const [cookies] = useCookies(['token']);
@@ -50,7 +55,14 @@ export default function NavDash() {
   
     return (
       <Nav>
-        {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} width={64} height={64} alt={`avatar de ${user.username}`}/>}
+        <Header>
+          <picture>
+            <figure>
+            {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} width={64} height={64} alt={`avatar de ${user.username}`}/>}
+            </figure>
+          </picture>
+          {user.username && <p>{user.username}</p>}
+        </Header>
       </Nav>
     );
   }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import * as Style from "@/src/styles/navStyle"
+import Link from "next/link";
 import useClick from "../hooks/useClick";
 import Bars from "../icon/bars";
 import Logo from "@/src/icon/logo";
@@ -71,9 +72,11 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
             <Style.Nav>
                 <Style.Content>
                     <Bars width={32} height={32}/>
-                    <Style.LogoContent>
-                        <Logo width={140} height={30}/>
-                    </Style.LogoContent>
+                    <Link href="/">
+                        <Style.LogoContent>
+                            <Logo width={140} height={30}/>
+                        </Style.LogoContent>
+                    </Link>
                 </Style.Content>
                 <Style.Content>
                     <Style.SearchContainer>

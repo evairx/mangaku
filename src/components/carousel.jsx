@@ -275,6 +275,7 @@ function Carousel() {
 
         const data = await response.json();
         setMangas(data);
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -284,6 +285,14 @@ function Carousel() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if(mangas.length === 0) {
+      setLoading(true);
+    }
+  }, [mangas]);
+
+  console.log(mangas)
 
   return (
         <>
@@ -317,14 +326,14 @@ function Carousel() {
         {mangas.map((manga, index) => (
           <Container key={index}>
             <Info>
-              <Link href={`/view/${manga.slug}`}><Logo style={!manga.logo ? { width: "170px", height: "240px", marginBottom: '20px', boxShadow: '0px 0px 15px 5px rgba(0,0,0,0.43)' } : {}}>
+              <Link href={`/detail/${manga.slug}`}><Logo style={!manga.logo ? { width: "170px", height: "240px", marginBottom: '20px', boxShadow: '0px 0px 15px 5px rgba(0,0,0,0.43)' } : {}}>
                 <picture>
                   <img loading="lazy" src={manga.logo ? manga.logo : manga.poster} alt={manga.title}/>
                 </picture>
               </Logo></Link>
                 {isWidth && <Text>{manga.overview}</Text>}
               <div>
-              <Button>Empezar a leer</Button>
+              <Link href={`/detail/${manga.slug}`}><Button>Empezar a leer</Button></Link>
               </div>
             </Info>
             <Figure>
