@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
 import styled from '@emotion/styled';
 
@@ -8,97 +9,8 @@ const Space = styled.div`
     background-color: var(--background-nav);
 `;
 
-const Container = styled.section`
-    position:relative;
-    height: 50vh;
-    width: 100%;
-    overflow: hidden;
-    padding: 1rem 5rem;
-    background: linear-gradient(transparent, var(--helios-gradient-1), var(--helios-gradient-2),var(--helios-gradient-3)),linear-gradient(to left, transparent, var(--helios-gradient-1a), var(--helios-gradient-2a), var(--helios-gradient-3a));
-`;
+const Container = styled.div`
 
-const Background = styled.figure`
-    position: absolute;
-    top: 0px;
-    left: 0;
-    width: 100%;
-    height:auto;
-    z-index: -1;
-    filter: blur(9px);
-    overflow: hidden;
-
-    img {
-        width: 100%;
-        object-fit: cover;
-    }
-`
-
-const Main = styled.main`
-    position: absolute;
-    bottom: 20px;
-`
-
-const Poster =  styled.figure`
-    width:200px;
-    height:284px;
-    overflow: hidden;
-    -webkit-box-shadow: 0px 0px 15px -2px #000000; 
-    box-shadow: 0px 0px 15px -2px #000000;
-    border-radius:8px;
-
-    img {
-        width: 100%;
-        object-fit: cover;
-    }
-`
-const Info = styled.article`
-    display:flex;
-    gap: 1rem;
-`
-
-const InfoContent = styled.div`
-    position: absolute;
-    left:14rem;
-    bottom: 0px;
-`
-
-const Title = styled.h1`
-    font-size: 2rem;
-    width: 1000px;
-    font-weight: 600;
-    margin-bottom:.400rem
-`
-
-const Overview = styled.p`
-    margin-bottom:.400rem;
-    margin-top:.400rem;
-`
-
-const TitleAlternative = styled.p`
-    margin-bottom:.400rem;
-    color: #cfcfcf;
-`
-
-const ButtonContainer = styled.div`
-    display:flex;
-    gap:.400rem
-`
-
-const GenresContainer = styled.div`
-  display:flex;
-  gap:.400rem;
-  margin-bottom:.800rem
-`
-const Genres = styled.span`
-    background-color: var(--background-nav);
-    padding: .200rem .700rem;
-    border-radius: 8px;
-`
-
-const Button = styled.button`
-    font-size: 1.050rem;
-    padding: .200rem 0;
-    width:130px;
 `
 
 const ContentLoad = styled.div`
@@ -152,14 +64,13 @@ const Bar = styled.span`
 
 export default function Detail({token}) {
     const [manga, setManga] = useState({});
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(2);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { slug } = router.query;
 
     useEffect(() => {
         const fetchData = async () => {
-
             try {
                 await fetch(`/api/v1/manga/${slug}`, {
                     headers: {
@@ -215,36 +126,7 @@ export default function Detail({token}) {
                 </ContentLoad>
                 :
                 <Container>
-                    <Background>
-                        <picture>
-                            <img src={manga.background}/>
-                        </picture>
-                    </Background>
-                    <Main>
-                        <Info>
-                            {manga.poster &&
-                            <Poster>
-                                <picture>
-                                    <img src={manga.poster}/>
-                                </picture>
-                            </Poster>}
-                            <InfoContent>
-                                {manga.title && <Title>{manga.title}</Title>}
-                                {manga.titleJp && <TitleAlternative>{manga.titleJp}</TitleAlternative >}
-                                {manga.overview && <Overview>{manga.overview}</Overview>}
-                                {manga.author && <TitleAlternative>{manga.author}</TitleAlternative >}
-                                <GenresContainer>
-                                    {manga.genres && manga.genres.map((genre, index) => (
-                                        <Genres key={index}>{genre}</Genres>
-                                    ))}
-                                </GenresContainer>
-                                <ButtonContainer>
-                                    <Button onClick={handleChapters}>Capitulos</Button>
-                                    <Button onClick={handleComents}>Comentarios</Button>
-                                </ButtonContainer>
-                            </InfoContent>
-                        </Info>
-                    </Main>
+      
                 </Container>
             }
 
@@ -254,7 +136,7 @@ export default function Detail({token}) {
                 }
 
                 {page === 2 &&
-                    <p>comentarios</p>
+                    <Comments id={manga._id} />
                 }
             </div>}
         </Layout>

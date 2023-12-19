@@ -25,6 +25,7 @@ export default function GlobalStyles({theme}) {
       --main: ${theme === "--dark" ? "#ff3f3f": "#ff0a0a"};
       --main-: ${theme === "--dark" ? "#1a1c20": "#fff"};
       --color: ${theme === "--dark" ? "#fff": "#000"};
+      --btn-filter-command: ${theme === "--dark" ? "#23252ba0": "#8890a897"};
       --usernav: ${theme === "--dark" ? "#33333393": "#ffffff58"};
       --color-2: ${theme === "--dark" ? "#000": "#fff"};
       --btn-hover: ${theme === "--dark" ? "#ffffff23": "#00000023"}; 

@@ -14,7 +14,7 @@ import Theme from "@/src/icon/theme"
 import SearchIco from "../icon/search";
 
 export default function Menu({ handleDark, handleLight, handleSystem }) {
-    const [user, setUser] = useState([]);
+    const [user, setUser] = useState({});
     const [cookies] = useCookies(['token']);
     const [userRef, openUser, setOpenUser] = useClick(false);
     const [themeRef, openTheme, setOpenTheme] = useClick(false);
@@ -25,6 +25,7 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
 
         if (!token) {
             setLoading(false);
+            return;
         }
 
         if (token) {
