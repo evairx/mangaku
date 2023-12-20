@@ -1,5 +1,6 @@
 import Connect from "@/db/connect";
 import Comment from "@/models/Comment";
+
 export default async function handler(req, res) {
     const { method } = req;
 

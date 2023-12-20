@@ -35,14 +35,23 @@ const UserCommentView = styled.div`
     background-color: var(--background-nav);
     margin-top: 1rem;
     padding: 1rem;
+    width: 100%;
 `
 
 
 const HeaderSub = styled.div`
     display:flex;
+    justify-content:space-between;
+    width:100%;
     align-items:center;
     gap:.500rem;
     margin-bottom: .400rem;
+`
+
+const UserDate = styled.div`
+    gap:.500rem;
+    display:flex;
+    align-items:center;
 `
 
 const Name = styled.h1`
@@ -214,7 +223,7 @@ export default function Comments({ id }) {
 
     const fetchData = async () => {
         try {
-            await fetch(`/api/v1/coment/${id}`)
+            await fetch(`/api/v1/comment/${id}`)
             .then(response => {
                 if (!response.ok) {
                   throw new Error(response.statusText);
@@ -298,8 +307,7 @@ export default function Comments({ id }) {
           userId: user._id,
         };
 
-
-        fetch('/api/v1/coment/add', {
+        fetch('/api/v1/comment/add', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -308,17 +316,34 @@ export default function Comments({ id }) {
         })
         .then(response => response.json())
         .then(data => {
-          // Lógica adicional después de enviar la solicitud (si es necesario)
-          console.log('Respuesta del servidor:', data);
-          // Limpiar el estado después de enviar el comentario
           setComment('');
           fetchData();
         })
         .catch(error => {
-          // Manejo de errores
           console.error('Error al enviar comentario:', error);
         });
       };
+
+      const DeleteComment = (commentId) => { 
+        const comentarioData = {
+            commentId: commentId,
+        };
+
+        fetch('/api/v1/comment/delete', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(comentarioData),
+        })
+        .then(response => response.json())
+        .then(data => {
+          fetchData();
+        })
+        .catch(error => {
+          console.error('Error al enviar comentario:', error);
+        });
+      }
 
       const handleLike = (commentId) => {
         const responseLike = {
@@ -326,7 +351,7 @@ export default function Comments({ id }) {
           userId: user._id,
         };
 
-        fetch('/api/v1/coment/handle', {
+        fetch('/api/v1/comment/handle', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -412,10 +437,13 @@ export default function Comments({ id }) {
                 {commentData && commentData.map((comment, index) => (
                     <UserCommentView key={index}>
                         <img src={comment.avatar} alt={comment.username} width={80} height={80}/>
-                        <div>
+                        <div style={{width: '100%'}}>
                             <HeaderSub>
-                                <Name>{comment.username}</Name>
-                                <Date>{comment.date}</Date>
+                                <UserDate>
+                                    <Name>{comment.username}</Name>
+                                    <Date>{comment.date}</Date>
+                                </UserDate>
+                                {user._id && user._id === comment.userId && <p onClick={() => DeleteComment(comment._id)}>Eliminar</p>}
                             </HeaderSub>
                             <p>{comment.content}</p>
                             <Sub>
