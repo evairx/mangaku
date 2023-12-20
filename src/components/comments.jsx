@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
+import Link from "next/link";
 import FilterIcon from "@/src/icon/filterComment";
-import Reply from "@/src/icon/Reply";
+import Liked from "@/src/icon/Liked";
 import Like from "@/src/icon/Like";
 import styled from "@emotion/styled"
 
@@ -65,6 +66,7 @@ const Content = styled.div`
     display: flex;
     align-items:center;
     gap:.400rem;
+    cursor: pointer;
 `
 
 const ContainerComments = styled.div`
@@ -318,6 +320,28 @@ export default function Comments({ id }) {
         });
       };
 
+      const handleLike = (commentId) => {
+        const responseLike = {
+          commentId: commentId,
+          userId: user._id,
+        };
+
+        fetch('/api/v1/coment/handle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(responseLike),
+        })
+          .then(response => response.json())
+          .then(data => {
+            fetchData();
+          })
+          .catch(error => {
+            console.error('Error al enviar comentario:', error);
+          });
+      };
+      
     return (
         <>
         { user._id ?
@@ -395,10 +419,23 @@ export default function Comments({ id }) {
                             </HeaderSub>
                             <p>{comment.content}</p>
                             <Sub>
-                                <Content>
-                                    <Like width={18} height={18}/>
+                            {user._id ? 
+                                <Content onClick={() => handleLike(comment._id)}>
+                                    {comment.likes && comment.likes.includes(user._id) ? (
+                                        <Liked width={18} height={18} />
+                                    ) : (
+                                        <Like width={18} height={18} />
+                                    )}
                                     <p>{comment.likeCount}</p>
                                 </Content>
+                                :
+                                <Link href="/login">
+                                    <Content>
+                                        <Like width={18} height={18} />
+                                        <p>{comment.likeCount}</p>
+                                    </Content>
+                                </Link>
+                            }
                             </Sub>
                         </div>
                     </UserCommentView>
