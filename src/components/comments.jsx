@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
+import useQuery from "../hooks/useQuery";
 import Link from "next/link";
 import FilterIcon from "@/src/icon/filterComment";
 import Liked from "@/src/icon/Liked";
@@ -13,7 +14,21 @@ const Header = styled.main`
     gap:.900rem;
     width: 70%;
     margin: 0 auto;
-    margin-top: 1rem;
+    margin-top: ${props => (props.isMobile ? '0rem' : '1rem')};
+    transition: all .3s ease;
+
+    @media screen and (max-width: 1400px) {
+        width: 85%;
+    }
+
+    @media screen and (max-width: 850px) {
+        width: 95%;
+    }
+
+    @media screen and (max-width: 653px) {
+        font-size: .800rem;
+    }
+    
 `
 
 const View = styled.section`
@@ -22,6 +37,14 @@ const View = styled.section`
     gap:.900rem;
     width: 70%;
     margin: 0 auto;
+    transition: all .3s ease;
+    @media screen and (max-width: 1400px) {
+        width: 85%;
+    }
+
+    @media screen and (max-width: 850px) {
+        width: 95%;
+    }
 `
 
 const ViewComment = styled.div`
@@ -32,10 +55,9 @@ const ViewComment = styled.div`
 const UserCommentView = styled.div`
     display: flex;
     gap: .900rem;
-    background-color: var(--background-nav);
     margin-top: 1rem;
-    padding: 1rem;
     width: 100%;
+    transition: all .3s ease;
 `
 
 
@@ -57,12 +79,20 @@ const UserDate = styled.div`
 const Name = styled.h1`
     font-size: 1.200rem;
     font-weight: 600;
+
+    @media screen and (max-width: 653px) {
+        font-size: 1rem;
+    }
 `
 
 const Date = styled.p`
     font-size: .900rem;
     font-weight: 400;
     opacity: .8;
+
+    @media screen and (max-width: 653px) {
+        font-size: .700rem;
+    }
 `
 
 const Sub = styled.div`
@@ -83,12 +113,18 @@ const ContainerComments = styled.div`
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:155px;
+    min-height: ${props => (props.isMobile ? 'auto' : '155px')};
     gap:.900rem;
+
+    @media screen and (max-width: 653px) {
+        padding: 1rem;
+        display: block;
+        width: 100%;
+    }
 `
 
 const Avatar = styled.figure`
-  width: 64px;
+  width: 64px; 
   height: 64px;
   border-radius: 50%;
   overflow: hidden;
@@ -116,7 +152,7 @@ const CommentArea = styled.div`
     margin:0 auto;
     text-align: center;
     background-color: var(--background-nav);
-
+    margin-top: 1rem;
     color: var(--color);
     border: 1px solid var(--color);
     border-style: dashed;
@@ -124,18 +160,40 @@ const CommentArea = styled.div`
     h3 {
         margin-bottom: .400rem;
     }
+
+    @media screen and (max-width: 1400px) {
+        width: 600px;
+        }
+    
+       @media screen and (max-width: 850px) {
+        width: 500px;
+       }
+    
+       @media screen and (max-width: 653px) {
+        width: 100%;
+       }
 `
 
 const CommentButtons = styled.div`
     display:flex;
     align-items:center;
     justify-content:space-between;
+
+    @media screen and (max-width: 653px) {
+        display: initial;
+        width: 100%;
+    }
 `
 
 const Btns = styled.div`
     display:flex;
     align-items:center;
     gap:.400rem;
+
+    @media screen and (max-width: 653px) {
+        display: initial;
+        width: 100%;
+    }
 `
 
 const CancelBtn =  styled.button`
@@ -149,6 +207,11 @@ const CancelBtn =  styled.button`
     &:hover {
         border: 2px solid var(--color);
         color: var(--color);
+    }
+
+    @media screen and (max-width: 653px) {
+        width: 100%;
+        margin-top: .400rem;
     }
 `
 const ConfirmBtn =  styled.button`
@@ -164,6 +227,11 @@ const ConfirmBtn =  styled.button`
         background:var(--color);
         color: var(--color-2);
     }
+
+    @media screen and (max-width: 653px) {
+        width: 100%;
+        margin-top: .400rem;
+    }
 `
 
 const ConfirmBtnDisabled =  styled.button`
@@ -173,6 +241,11 @@ const ConfirmBtnDisabled =  styled.button`
     font-size: 1rem;
     padding: .400rem .700rem;
     opacity: .5;
+
+    @media screen and (max-width: 653px) {
+        width: 100%;
+        margin-top: .400rem;
+    }
 `
 
 const SpoilerContent = styled.div`
@@ -190,6 +263,26 @@ const TextArea = styled.textarea`
   form-sizing: content;
   background-color: var(--background-nav);
   color: var(--color);
+  transition: all .3s ease;
+
+  @media screen and (max-width: 1400px) {
+    width: 600px;
+    }
+
+   @media screen and (max-width: 850px) {
+    width: 500px;
+   }
+
+   @media screen and (max-width: 653px) {
+    width: 100%;
+   }
+`
+
+const MobileName = styled.div`
+   display: flex;
+   align-items: center;
+   gap: .400rem;
+   margin-bottom: .800rem;
 `
 
 const ButtonFilter = styled.button`
@@ -209,6 +302,10 @@ const ButtonFilter = styled.button`
     &:hover {
         background:var(--btn-filter-command);
     }
+
+    @media screen and (max-width: 653px) {
+        font-size: .800rem;
+    }
 `
 
 export default function Comments({ id }) {
@@ -218,6 +315,7 @@ export default function Comments({ id }) {
     const [actived, setActived] = useState(false);
     const [loading, setLoading] = useState(true);
     const [cookies] = useCookies(['token']);
+    const isMobile = useQuery('(max-width: 653px)');
 
     const maxLength = 450;
 
@@ -317,6 +415,7 @@ export default function Comments({ id }) {
         .then(response => response.json())
         .then(data => {
           setComment('');
+          setActived(false);
           fetchData();
         })
         .catch(error => {
@@ -370,17 +469,28 @@ export default function Comments({ id }) {
     return (
         <>
         { user._id ?
-            <ContainerComments>
-                {loading ?
-                <p>cargando</p>:
-                <Avatar>
-                    <figure>
-                        {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username}/>}
-                    </figure>
-                </Avatar>}
+            <ContainerComments isMobile={isMobile}>
+                {isMobile ? undefined :
+                <>
+                    {loading ?
+                    <p>cargando</p>:
+                    <Avatar>
+                        <figure>
+                            {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username}/>}
+                        </figure>
+                    </Avatar>}
+                </>
+                }
                 <div>
                     <CommentHeaderTitles>
+                        {isMobile ?
+                        <MobileName>
+                            <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username} style={{borderRadius: '50%'}} width={30} height={30}/>
+                            <CommentTile>Comentar como {user.username}</CommentTile>
+                        </MobileName>:
                         <CommentTile>Comentar como {user.username}</CommentTile>
+                        }
+                        {isMobile ? undefined :
                         <CommentHeaderTitles>
                             {actived &&
                             <>
@@ -388,7 +498,7 @@ export default function Comments({ id }) {
                                 <p>/</p>
                                 <p>{maxLength}</p>
                             </>}
-                        </CommentHeaderTitles>
+                        </CommentHeaderTitles>}
                     </CommentHeaderTitles>
                     <TextArea
                         actived={actived}
@@ -424,7 +534,7 @@ export default function Comments({ id }) {
             </ContainerComments>
         }
 
-        <Header>
+        <Header isMobile={isMobile}>
             <h2>{comments.count ? comments.count: '0'} Comentario{comments?.count > 1 && 's'}</h2>
             <ButtonFilter>
                 <FilterIcon width={24} height={24}/>
@@ -436,14 +546,21 @@ export default function Comments({ id }) {
             <ViewComment>
                 {commentData && commentData.map((comment, index) => (
                     <UserCommentView key={index}>
-                        <figure>
+                        {isMobile ? undefined:<figure>
                             <picture>
-                                <img src={comment.avatar} alt={comment.username} width={80} height={80}/>
+                                <img src={comment.avatar} alt={comment.username} style={{borderRadius: '50%'}}  width={80} height={80}/>
                             </picture>
-                        </figure>
+                        </figure>}
                         <div style={{width: '100%'}}>
                             <HeaderSub>
                                 <UserDate>
+                                    {isMobile &&
+                                        <figure>
+                                            <picture>
+                                                <img src={comment.avatar} alt={comment.username} width={24} height={24} style={{borderRadius: '50%'}}/>
+                                            </picture>
+                                        </figure>
+                                    }
                                     <Name>{comment.username}</Name>
                                     <Date>{comment.date}</Date>
                                 </UserDate>
