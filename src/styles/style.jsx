@@ -20,7 +20,7 @@ export default function GlobalStyles({theme}) {
       --dark:#000;
       --light:#fffff;
       --border: ${theme === "--dark" ? "#eeeeee68": "#00000068"};
-      --background-nav:${theme === "--dark" ? "#17181c": "#ffff"};
+      --background-nav:${theme === "--dark" ? "#17181c": "#d5d5d5"};
       --loader-bars: ${theme === "--dark" ? "rgba(255, 255, 255, 0.5)": "rgba(8, 7, 7, 0.5)"};
       --main: ${theme === "--dark" ? "#ff3f3f": "#ff0a0a"};
       --main-: ${theme === "--dark" ? "#1a1c20": "#fff"};
@@ -52,6 +52,39 @@ export default function GlobalStyles({theme}) {
     body {
       background-color: var(${theme});
       color:${theme === "--dark" ? "#ffff": "#000"};
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 8px;
+      border-radius: 4px !important;
+    }
+    ::-webkit-scrollbar-button {
+      width: 0px;
+      height: 0px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #afafaf;
+      border: 0px none #ffffff;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+    }
+    ::-webkit-scrollbar-thumb:active {
+      background: #ffffff;
+    }
+    ::-webkit-scrollbar-track {
+      background: none;
+      border: 0px none #ffffff;
+    }
+    ::-webkit-scrollbar-track:hover {
+        background: none;
+    }
+    ::-webkit-scrollbar-track:active {
+      background: none;
+    }
+    ::-webkit-scrollbar-corner {
+      background: transparent;
     }
   `;
 

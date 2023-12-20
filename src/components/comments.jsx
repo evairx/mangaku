@@ -405,7 +405,7 @@ export default function Comments({ id }) {
                             </SpoilerContent>
                             <Btns>
                                 <CancelBtn onClick={handleCancel}>Cancelar</CancelBtn>
-                                {comment.length > maxLength ?
+                                {comment.length === 0 || comment.length > maxLength ?
                                     <ConfirmBtnDisabled>Comentar</ConfirmBtnDisabled>
                                     :
                                     <ConfirmBtn onClick={submitHandlet}>Comentar</ConfirmBtn>
@@ -436,7 +436,11 @@ export default function Comments({ id }) {
             <ViewComment>
                 {commentData && commentData.map((comment, index) => (
                     <UserCommentView key={index}>
-                        <img src={comment.avatar} alt={comment.username} width={80} height={80}/>
+                        <figure>
+                            <picture>
+                                <img src={comment.avatar} alt={comment.username} width={80} height={80}/>
+                            </picture>
+                        </figure>
                         <div style={{width: '100%'}}>
                             <HeaderSub>
                                 <UserDate>
