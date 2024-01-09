@@ -308,11 +308,16 @@ const ButtonFilter = styled.button`
     }
 `
 
+const CommentedSection = styled.section`
+
+`
+
 export default function Comments({ id }) {
     const [user, setUser] = useState({});
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState({});
     const [actived, setActived] = useState(false);
+    const [commented, setCommented] = useState('');
     const [loading, setLoading] = useState(true);
     const [cookies] = useCookies(['token']);
     const isMobile = useQuery('(max-width: 653px)');
@@ -414,9 +419,9 @@ export default function Comments({ id }) {
         })
         .then(response => response.json())
         .then(data => {
-          setComment('');
-          setActived(false);
-          fetchData();
+            setComment('');
+            setActived(false);
+            setCommented(comment);
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -533,6 +538,49 @@ export default function Comments({ id }) {
                 </CommentArea>
             </ContainerComments>
         }
+
+        {commented && <View style={{background: 'var(--background-nav)', padding: '10px', marginBottom: '20px', marginTop: '20px'}}>
+            <ViewComment>
+                <UserCommentView>
+                    {isMobile ? undefined: <figure>
+                        <picture>
+                            {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`} style={{borderRadius: '50%'}}  width={80} height={80} />}
+                        </picture>
+                    </figure>}
+                    <div style={{width: '100%'}}>
+                            <HeaderSub>
+                                <UserDate>
+                                    {isMobile &&
+                                        <figure>
+                                            <picture>
+                                            {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`} style={{borderRadius: '50%'}}  width={24} height={24} />}
+                                            </picture>
+                                        </figure>
+                                    }
+                                    <Name>{user.username}</Name>
+                                    <Date>Ahora mismo</Date>
+                                </UserDate>
+                            </HeaderSub>
+                            <p>{commented}</p>
+                            <Sub>
+                            {user._id ? 
+                                <Content>
+                                    <Like width={18} height={18} />
+                                    <p>0</p>
+                                </Content>
+                                :
+                                <Link href="/login">
+                                    <Content>
+                                        <Like width={18} height={18} />
+                                        <p>0</p>
+                                    </Content>
+                                </Link>
+                            }
+                            </Sub>
+                        </div>
+                </UserCommentView>
+            </ViewComment>
+        </View>}
 
         <Header isMobile={isMobile}>
             <h2>{comments.count ? comments.count: '0'} Comentario{comments?.count > 1 && 's'}</h2>
