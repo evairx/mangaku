@@ -81,7 +81,33 @@ export default async function handler(req, res) {
 
                 const { mangaId, userId, date, likes , ...commentData } = comment.toObject();
 
-                const likeCount = likes ? likes.length : 0;
+                const likee = likes ? likes.length : 0;
+
+                console.log(likee)
+
+                function formatLikesCount(likee) {
+                    if (likee >= 1000 && likee < 1000000) {
+                      return formatNumberWithK(likee, 1000);
+                    } else if (likee >= 1000000 && likee < 1000000000) {
+                      return formatNumberWithK(likee, 1000000);
+                    } else if (likee >= 1000000000) {
+                      return formatNumberWithK(likee, 1000000000);
+                    } else {
+                      return likee.toString();
+                    }
+                  }
+                  
+                  function formatNumberWithK(number, divisor) {
+                    if (number % divisor === 0) {
+                      return (number / divisor) + ' K';
+                    } else if ((number % divisor) % 100 === 0) {
+                      return (number / divisor).toFixed(1) + ' K';
+                    } else {
+                      return (number / divisor).toFixed(1).replace(/\.0$/, '') + ' K';
+                    }
+                  }
+
+                const likeCount = formatLikesCount(likee);
 
                 return {
                     ...commentData,

@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 import useQuery from "../hooks/useQuery";
 import Link from "next/link";
 import FilterIcon from "@/src/icon/filterComment";
-import RE from "@/src/icon/Reply"
+import MoreIco from "@/src/icon/More"
 import Liked from "@/src/icon/Liked";
 import Like from "@/src/icon/Like";
 import styled from "@emotion/styled"
@@ -99,8 +99,8 @@ const Date = styled.p`
 
 const Sub = styled.div`
     display: flex;
-    gap: .900rem;
-    margin-top: .600rem;
+    gap: 1.200rem;
+    margin-top: 1.400rem;
 `
 
 const Content = styled.div`
@@ -316,9 +316,9 @@ const ButtonFilter = styled.button`
     }
 `
 
-const Reply = styled.section`
+const ContentS = styled.section`
     display:flex;
-    gap:.400rem;
+    gap:.200rem;
     align-items:center;
 `
 
@@ -468,18 +468,6 @@ export default function Comments({ id }) {
       };
 
       const DeleteComment = (commentId) => { 
-        const updatedComments = comments.comments.map(comment => {
-            if (comment._id === commentId) {
-              return { ...comment, content: "[COMENTARIO ELIMINADO]" };
-            }
-            return comment;
-          });
-      
-          setComments({
-            ...comments,
-            comments: updatedComments,
-          });
-
         const comentarioData = {
             commentId: commentId,
         };
@@ -493,6 +481,17 @@ export default function Comments({ id }) {
         })
         .then(response => response.json())
         .then(data => {
+            const updatedComments = comments.comments.map(comment => {
+                if (comment._id === commentId) {
+                  return { ...comment, content: "[COMENTARIO ELIMINADO]" };
+                }
+                return comment;
+              });
+          
+              setComments({
+                ...comments,
+                comments: updatedComments,
+              });
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -501,24 +500,44 @@ export default function Comments({ id }) {
 
       function addLike(commentId) {
         const updatedComments = comments.comments.map(comment => {
-          if (comment._id === commentId) {
-            const userIndex = comment.likes.indexOf(user._id);
-            if (userIndex !== -1) {
-              comment.likes.splice(userIndex, 1);
+            if (comment._id === commentId) {
+              const userIndex = comment.likes.indexOf(user._id);
+              if (userIndex !== -1) {
+                comment.likes.splice(userIndex, 1);
+              } else {
+                comment.likes.push(user._id);
+              }
+          
               comment.likeCount = comment.likes.length;
+          
+              // Formatear likeCount con K si es mayor o igual a 1000
+              comment.likeCount = formatLikeCount(comment.likeCount);
+            }
+            return comment;
+          });
+          
+          setComments(prevComments => ({
+            ...prevComments,
+            comments: updatedComments,
+          }));
+          
+          // Función para formatear el likeCount con K si es mayor o igual a 1000
+          function formatLikeCount(count) {
+            if (count >= 1000) {
+              return formatNumberWithK(count, 1000);
+            }
+            return count.toString();
+          }
+          
+          function formatNumberWithK(number, divisor) {
+            if (number % divisor === 0) {
+              return `${Math.floor(number / divisor)} K`;
+            } else if ((number % divisor) % 100 === 0) {
+              return `${(number / divisor).toFixed(1)} K`;
             } else {
-              comment.likes.push(user._id);
-              comment.likeCount = comment.likes.length;
+              return `${(number / divisor).toFixed(1).replace(/\.0$/, '')} K`;
             }
           }
-          return comment;
-        });
-
-        setComments(prevComments => ({
-          ...prevComments,
-          comments: updatedComments,
-        }));
-
         const responseLike = {
             commentId: commentId,
             userId: user._id,
@@ -676,9 +695,9 @@ export default function Comments({ id }) {
                             {user._id ? 
                                 <Content onClick={() => addLike(comment._id)}>
                                     {comment.likes && comment.likes.includes(user._id) ? (
-                                        <Liked width={18} height={18} />
+                                        <Liked style={{marginBottom:'2px'}} width={22} height={22} />
                                     ) : (
-                                        <Like width={18} height={18} />
+                                        <Like style={{marginBottom:'2px'}} width={22} height={22} />
                                     )}
                                     <p>{comment.likeCount}</p>
                                 </Content>
@@ -690,6 +709,10 @@ export default function Comments({ id }) {
                                     </Content>
                                 </Link>
                             }
+                                <ContentS>
+                                    <MoreIco width={22} height={22}/>
+                                    <p>MÁS</p>
+                                </ContentS>
                             </Sub>
                         </div>
                     </UserCommentView>
