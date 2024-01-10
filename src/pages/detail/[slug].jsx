@@ -126,7 +126,7 @@ export default function Detail({token}) {
                 </ContentLoad>
                 :
                 <Container>
-      
+                  
                 </Container>
             }
 

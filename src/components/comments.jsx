@@ -317,7 +317,6 @@ export default function Comments({ id }) {
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState({});
     const [actived, setActived] = useState(false);
-    const [commented, setCommented] = useState('');
     const [loading, setLoading] = useState(true);
     const [cookies] = useCookies(['token']);
     const isMobile = useQuery('(max-width: 653px)');
@@ -404,6 +403,24 @@ export default function Comments({ id }) {
     const commentData = comments?.comments;
 
     const submitHandlet = () => {
+        const newComment = {
+            content: comment,
+            avatar: `/v1/static/avatar/${user.avatar}`,
+            date: 'Ahora mismo',
+            likeCount: 0,
+            likes: [],
+            spoilerContent: false,
+            username: user.username,
+            new: true
+          };
+
+          const updatedComments = {
+            comments: [...comments.comments, newComment],
+            count: comments.count + 1,
+          };
+      
+          setComments(updatedComments);
+
         const comentarioData = {
           content: comment,
           mangaId: id,
@@ -421,7 +438,6 @@ export default function Comments({ id }) {
         .then(data => {
             setComment('');
             setActived(false);
-            setCommented(comment);
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -449,28 +465,46 @@ export default function Comments({ id }) {
         });
       }
 
-      const handleLike = (commentId) => {
-        const responseLike = {
-          commentId: commentId,
-          userId: user._id,
-        };
+      function addLike(commentId) {
+        const updatedComments = comments.comments.map(comment => {
+          if (comment._id === commentId) {
+            const userIndex = comment.likes.indexOf(user._id);
+            if (userIndex !== -1) {
+              comment.likes.splice(userIndex, 1);
+              comment.likeCount = comment.likes.length;
+            } else {
+              comment.likes.push(user._id);
+              comment.likeCount = comment.likes.length;
+            }
+          }
+          return comment;
+        });
 
+        setComments(prevComments => ({
+          ...prevComments,
+          comments: updatedComments,
+        }));
+
+        const responseLike = {
+            commentId: commentId,
+            userId: user._id,
+        };
+  
         fetch('/api/v1/comment/handle', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(responseLike),
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(responseLike),
         })
-          .then(response => response.json())
-          .then(data => {
-            fetchData();
-          })
-          .catch(error => {
+        .then(response => response.json())
+        .then(data => {
+        })
+        .catch(error => {
             console.error('Error al enviar comentario:', error);
-          });
-      };
-      
+        });
+      }
+
     return (
         <>
         { user._id ?
@@ -539,49 +573,6 @@ export default function Comments({ id }) {
             </ContainerComments>
         }
 
-        {commented && <View style={{background: 'var(--background-nav)', padding: '10px', marginBottom: '20px', marginTop: '20px'}}>
-            <ViewComment>
-                <UserCommentView>
-                    {isMobile ? undefined: <figure>
-                        <picture>
-                            {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`} style={{borderRadius: '50%'}}  width={80} height={80} />}
-                        </picture>
-                    </figure>}
-                    <div style={{width: '100%'}}>
-                            <HeaderSub>
-                                <UserDate>
-                                    {isMobile &&
-                                        <figure>
-                                            <picture>
-                                            {user?.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={`avatar de ${user.username}`} style={{borderRadius: '50%'}}  width={24} height={24} />}
-                                            </picture>
-                                        </figure>
-                                    }
-                                    <Name>{user.username}</Name>
-                                    <Date>Ahora mismo</Date>
-                                </UserDate>
-                            </HeaderSub>
-                            <p>{commented}</p>
-                            <Sub>
-                            {user._id ? 
-                                <Content>
-                                    <Like width={18} height={18} />
-                                    <p>0</p>
-                                </Content>
-                                :
-                                <Link href="/login">
-                                    <Content>
-                                        <Like width={18} height={18} />
-                                        <p>0</p>
-                                    </Content>
-                                </Link>
-                            }
-                            </Sub>
-                        </div>
-                </UserCommentView>
-            </ViewComment>
-        </View>}
-
         <Header isMobile={isMobile}>
             <h2>{comments.count ? comments.count: '0'} Comentario{comments?.count > 1 && 's'}</h2>
             <ButtonFilter>
@@ -592,8 +583,8 @@ export default function Comments({ id }) {
 
         <View>
             <ViewComment>
-                {commentData && commentData.map((comment, index) => (
-                    <UserCommentView key={index}>
+                {commentData && commentData.sort((a, b) => (a.new === true ? -1 : b.new === true ? 1 : 0)).map((comment, index) => (
+                    <UserCommentView style={{background: comment.new === true && 'var(--background-nav)', padding: comment.new === true && '10px'}} key={index}>
                         {isMobile ? undefined:<figure>
                             <picture>
                                 <img src={comment.avatar} alt={comment.username} style={{borderRadius: '50%'}}  width={80} height={80}/>
@@ -617,7 +608,7 @@ export default function Comments({ id }) {
                             <p>{comment.content}</p>
                             <Sub>
                             {user._id ? 
-                                <Content onClick={() => handleLike(comment._id)}>
+                                <Content onClick={() => addLike(comment._id)}>
                                     {comment.likes && comment.likes.includes(user._id) ? (
                                         <Liked width={18} height={18} />
                                     ) : (
