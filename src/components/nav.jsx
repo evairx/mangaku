@@ -22,43 +22,50 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = cookies.token;
-      
-        try {
-          const decoded = jwt.decode(token);
-      
-          if (decoded.status === "OFFLINE") {
-            setLoading(false);
-            return;
-          }
-      
-          const fetchUserAccount = async () => {
+        const fetchData = async () => {
+            const token = cookies.token;
+    
             try {
-              const response = await fetch('/api/v1/user/account', {
-                headers: {
-                  'Authorization': `Bearer ${token}`
+                if (!token) {
+                    setLoading(false);
+                    return;
                 }
-              });
-      
-              if (!response.ok) {
-                throw new Error(response.statusText);
-              }
-      
-              const data = await response.json();
-              setUser(data);
+    
+                const decoded = jwt.decode(token);
+    
+                if (!decoded || !decoded.status) {
+                    setLoading(false);
+                    return;
+                }
+    
+                const status = decoded.status;
+    
+                if (status === "OFFLINE") {
+                    setLoading(false);
+                    return;
+                }
+    
+                const response = await fetch('/api/v1/user/account', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+    
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+    
+                const data = await response.json();
+                setUser(data);
             } catch (error) {
-              console.error(error);
+                console.error(error);
             } finally {
-              setLoading(false);
+                setLoading(false);
             }
-          };
-      
-          fetchUserAccount();
-        } catch (decodeError) {
-          console.error("Error decoding token:", decodeError);
-          setLoading(true); 
-        }
-      }, []);
+        };
+    
+        fetchData();
+    }, []);  
 
     function handleUser() {
         setOpenUser(!openUser)

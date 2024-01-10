@@ -468,6 +468,18 @@ export default function Comments({ id }) {
       };
 
       const DeleteComment = (commentId) => { 
+        const updatedComments = comments.comments.map(comment => {
+            if (comment._id === commentId) {
+              return { ...comment, content: "[COMENTARIO ELIMINADO]" };
+            }
+            return comment;
+          });
+      
+          setComments({
+            ...comments,
+            comments: updatedComments,
+          });
+
         const comentarioData = {
             commentId: commentId,
         };
@@ -481,7 +493,6 @@ export default function Comments({ id }) {
         })
         .then(response => response.json())
         .then(data => {
-          fetchData();
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -512,11 +523,14 @@ export default function Comments({ id }) {
             commentId: commentId,
             userId: user._id,
         };
+
+        const token = cookies.token;
   
-        fetch('/api/v1/comment/handle', {
+        fetch('/api/v1/comment/votes', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(responseLike),
         })
@@ -676,10 +690,6 @@ export default function Comments({ id }) {
                                     </Content>
                                 </Link>
                             }
-                            <Reply>
-                                <RE width={22} height={22}/>
-                                <p>Responder</p>
-                            </Reply>
                             </Sub>
                         </div>
                     </UserCommentView>
