@@ -27,7 +27,13 @@ export default async function handler(req, res) {
             res.status(400).json({ message: "Credenciales inválidas" });
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '730h' });
+        const datos = {
+            status: "ACTIVE",
+            client_tag: "*",
+            id: user._id
+        }
+
+        const token = jwt.sign(datos, process.env.SECRET, { expiresIn: '730h' });
 
         res.status(200).json({ token });
     } else {

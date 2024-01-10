@@ -11,6 +11,20 @@ export default async function handler(req, res) {
     if (method === "GET") {
         await Connect();
 
+        const getToken = req.headers.authorization;
+
+        if(!getToken) {
+            return res.status(401).json({not_auth_token: {} });
+        }
+
+        const token = req.headers.authorization.split(" ")[1];
+
+        const decodedToken = jwt.verify(token, process.env.SECRET);
+
+        if (!(decodedToken.status === "OFFLINE" || decodedToken.status === "ACTIVE")) {
+            res.status(400).json({ not_allowed: {} });
+        }
+
         const manga = await Manga.findOne({ _id: id });
 
         if (!manga || (Array.isArray(manga) && manga.length === 0)) {
@@ -75,6 +89,7 @@ export default async function handler(req, res) {
                     avatar,
                     username,
                     date: formatTimeAgo(date),
+                    created: date,
                     likes: likes || [],
                     likeCount,
                 };

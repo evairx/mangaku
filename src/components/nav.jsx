@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
+import jwt from "jsonwebtoken"
 import * as Style from "@/src/styles/navStyle"
 import Link from "next/link";
 import useClick from "../hooks/useClick";
@@ -22,34 +23,40 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
 
     useEffect(() => {
         const token = cookies.token;
-
-        if (!token) {
+      
+        try {
+          const decoded = jwt.decode(token);
+      
+          if (decoded.status === "OFFLINE") {
             setLoading(false);
             return;
-        }
-
-        if (token) {
-          fetch('/api/v1/user/account', {
-            headers: {
-              'Authorization': `Bearer ${token}`
+          }
+      
+          const fetchUserAccount = async () => {
+            try {
+              const response = await fetch('/api/v1/user/account', {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+      
+              if (!response.ok) {
+                throw new Error(response.statusText);
+              }
+      
+              const data = await response.json();
+              setUser(data);
+            } catch (error) {
+              console.error(error);
+            } finally {
+              setLoading(false);
             }
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(response.statusText);
-            }
-            return response.json();
-          })
-          .then(data => {
-            setUser(data);
-            setLoading(false);
-          })
-          .catch(error => {
-            console.error(error);
-            setLoading(true);
-          });
-        } else {
-          // No hay token, redirigir a /login
+          };
+      
+          fetchUserAccount();
+        } catch (decodeError) {
+          console.error("Error decoding token:", decodeError);
+          setLoading(true); 
         }
       }, []);
 

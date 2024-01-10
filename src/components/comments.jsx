@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
+import jwt from "jsonwebtoken"
 import useQuery from "../hooks/useQuery";
 import Link from "next/link";
 import FilterIcon from "@/src/icon/filterComment";
+import RE from "@/src/icon/Reply"
 import Liked from "@/src/icon/Liked";
 import Like from "@/src/icon/Like";
 import styled from "@emotion/styled"
@@ -252,6 +254,12 @@ const SpoilerContent = styled.div`
     display:flex;
     align-items:center;
     gap:.400rem;
+
+    @media screen and (max-width: 653px) {
+        justify-content:space-between;
+        margin-top:10px;
+        margin-bottom:10px;
+    }
 `
 
 const TextArea = styled.textarea`
@@ -308,8 +316,10 @@ const ButtonFilter = styled.button`
     }
 `
 
-const CommentedSection = styled.section`
-
+const Reply = styled.section`
+    display:flex;
+    gap:.400rem;
+    align-items:center;
 `
 
 export default function Comments({ id }) {
@@ -318,14 +328,22 @@ export default function Comments({ id }) {
     const [comments, setComments] = useState({});
     const [actived, setActived] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState('likeCount');
+    const [initialSort, setInitialSort] = useState(true);
     const [cookies] = useCookies(['token']);
     const isMobile = useQuery('(max-width: 653px)');
 
     const maxLength = 450;
 
     const fetchData = async () => {
+        const token = cookies.token;
+
         try {
-            await fetch(`/api/v1/comment/${id}`)
+            await fetch(`/api/v1/comment/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+            })
             .then(response => {
                 if (!response.ok) {
                   throw new Error(response.statusText);
@@ -349,38 +367,42 @@ export default function Comments({ id }) {
     useEffect(() => {
         const fetchUser = async () => {
             const token = cookies.token;
-            
-            if (!token) {
+      
+            try {
+              const decoded = jwt.decode(token);
+          
+              if (decoded.status === "OFFLINE") {
                 setLoading(false);
                 return;
-            }
-
-            if(token) {
+              }
+          
+              const fetchUserAccount = async () => {
                 try {
-                    await fetch(`/api/v1/user/account`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }).then(response => {
-                        if (!response.ok) {
-                        throw new Error(response.statusText);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        setUser(data);
-                        setLoading(false);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        setLoading(true);
-                    });
+                  const response = await fetch('/api/v1/user/account', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`
+                    }
+                  });
+          
+                  if (!response.ok) {
+                    throw new Error(response.statusText);
+                  }
+          
+                  const data = await response.json();
+                  setUser(data);
                 } catch (error) {
-                    console.error(error);
-                    setLoading(true);
+                  console.error(error);
+                } finally {
+                  setLoading(false);
                 }
+              };
+          
+              fetchUserAccount();
+            } catch (decodeError) {
+              console.error("Error decoding token:", decodeError);
+              setLoading(true); 
             }
-        };
+        }
 
         fetchData();
         fetchUser();
@@ -403,24 +425,6 @@ export default function Comments({ id }) {
     const commentData = comments?.comments;
 
     const submitHandlet = () => {
-        const newComment = {
-            content: comment,
-            avatar: `/v1/static/avatar/${user.avatar}`,
-            date: 'Ahora mismo',
-            likeCount: 0,
-            likes: [],
-            spoilerContent: false,
-            username: user.username,
-            new: true
-          };
-
-          const updatedComments = {
-            comments: [...comments.comments, newComment],
-            count: comments.count + 1,
-          };
-      
-          setComments(updatedComments);
-
         const comentarioData = {
           content: comment,
           mangaId: id,
@@ -438,6 +442,25 @@ export default function Comments({ id }) {
         .then(data => {
             setComment('');
             setActived(false);
+
+            const newComment = {
+                content: comment,
+                avatar: `/v1/static/avatar/${user.avatar}`,
+                date: 'Ahora mismo',
+                likeCount: 0,
+                likes: [],
+                spoilerContent: false,
+                username: user.username,
+                _id: data.id,
+                new: true
+              };
+    
+              const updatedComments = {
+                comments: [...comments.comments, newComment],
+                count: comments.count + 1,
+              };
+          
+              setComments(updatedComments);
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -505,6 +528,28 @@ export default function Comments({ id }) {
         });
       }
 
+      const toggleSortOrder = () => {
+        setSortBy((prevSortBy) => (prevSortBy === 'likeCount' ? 'created' : 'likeCount'));
+        setInitialSort(!initialSort);
+    };
+    
+    const sortedComments = commentData
+    ? commentData
+        .sort((a, b) => {
+            if (a.new === true && b.new !== true) {
+                return -1;
+            } else if (a.new !== true && b.new === true) {
+                return 1;
+            } else if (initialSort) {
+                return b.likeCount - a.likeCount;
+            } else {
+                const aValue = typeof a[sortBy] === 'string' ? a[sortBy] : '';
+                const bValue = typeof b[sortBy] === 'string' ? b[sortBy] : '';
+                return bValue.localeCompare(aValue);
+            }
+        })
+    : [];
+
     return (
         <>
         { user._id ?
@@ -550,7 +595,14 @@ export default function Comments({ id }) {
                     {actived && 
                         <CommentButtons>
                             <SpoilerContent>
-                                <input type="checkbox" /> <p>Marcar como spoiler</p>
+                                <div style={{display: 'flex',gap: '.400rem'}}>
+                                    <input type="checkbox" /> <p>Marcar como spoiler</p>
+                                </div>
+                                {isMobile && <div style={{display: 'flex',gap: '.400rem'}}>
+                                    <p style={comment.length > maxLength ? {color: 'var(--main)'} : {}}>{comment.length}</p>
+                                    <p>/</p>
+                                    <p>{maxLength}</p>
+                                </div>}
                             </SpoilerContent>
                             <Btns>
                                 <CancelBtn onClick={handleCancel}>Cancelar</CancelBtn>
@@ -575,15 +627,15 @@ export default function Comments({ id }) {
 
         <Header isMobile={isMobile}>
             <h2>{comments.count ? comments.count: '0'} Comentario{comments?.count > 1 && 's'}</h2>
-            <ButtonFilter>
+            <ButtonFilter onClick={toggleSortOrder}>
                 <FilterIcon width={24} height={24}/>
-                POPULAR
+                {initialSort ? "POPULAR": "LO MÁS RECIENTE"}
             </ButtonFilter >
         </Header>
 
         <View>
             <ViewComment>
-                {commentData && commentData.sort((a, b) => (a.new === true ? -1 : b.new === true ? 1 : 0)).map((comment, index) => (
+                {sortedComments.map((comment, index) => (
                     <UserCommentView style={{background: comment.new === true && 'var(--background-nav)', padding: comment.new === true && '10px'}} key={index}>
                         {isMobile ? undefined:<figure>
                             <picture>
@@ -624,6 +676,10 @@ export default function Comments({ id }) {
                                     </Content>
                                 </Link>
                             }
+                            <Reply>
+                                <RE width={22} height={22}/>
+                                <p>Responder</p>
+                            </Reply>
                             </Sub>
                         </div>
                     </UserCommentView>
