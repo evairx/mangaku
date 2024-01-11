@@ -8,7 +8,7 @@ export default function Login({ url }) {
       e.preventDefault();
   
       try {
-        const response = await fetch(`${url}/api/v1/user/login`, {
+        const response = await fetch(`/api/v1/user/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

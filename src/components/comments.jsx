@@ -382,6 +382,14 @@ const AlertContainer = styled.section`
         height:230px;
         width:95%;
     }
+
+    @media screen and (max-width: 390px) {
+        height:250px;
+    }
+
+    @media screen and (max-width: 350px) {
+        height:230px;
+    }
 `
 
 const AlertTitle = styled.p`
@@ -548,10 +556,13 @@ export default function Comments({ id }) {
           userId: user._id,
         };
 
+        const token = cookies.token;
+
         fetch('/api/v1/comment/add', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(comentarioData),
         })
@@ -569,15 +580,16 @@ export default function Comments({ id }) {
                 spoilerContent: false,
                 username: user.username,
                 _id: data.id,
+                userId: user._id,
                 new: true
-              };
+            };
     
-              const updatedComments = {
-                comments: [...comments.comments, newComment],
-                count: comments.count + 1,
-              };
+            const updatedComments = {
+             comments: [...comments.comments, newComment],
+             count: comments.count + 1,
+            };
           
-              setComments(updatedComments);
+            setComments(updatedComments);
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -593,10 +605,13 @@ export default function Comments({ id }) {
             commentId: selectedCommentId,
         };
 
+        const token = cookies.token;
+
         fetch('/api/v1/comment/delete', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(comentarioData),
         })
@@ -604,7 +619,7 @@ export default function Comments({ id }) {
         .then(data => {
             const updatedComments = comments.comments.map(comment => {
                 if (comment._id === selectedCommentId) {
-                  return { ...comment, content: "[COMENTARIO ELIMINADO]" };
+                  return { ...comment, content: "[COMENTARIO ELIMINADO]", delete: true };
                 }
                 return comment;
               });
@@ -613,13 +628,13 @@ export default function Comments({ id }) {
                 ...comments,
                 comments: updatedComments,
               });
-
               setOpenAlert(false)
               setSelectedCommentId(null); 
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
         });
+        
       }
 
       function addLike(commentId) {
@@ -827,7 +842,7 @@ export default function Comments({ id }) {
                                 </UserDate>
                             </HeaderSub>
                             <p>{comment.content}</p>
-                            <Sub>
+                            {comment.delete ? null : <Sub>
                             {user._id ? 
                                 <Content onClick={() => addLike(comment._id)}>
                                     {comment.likes && comment.likes.includes(user._id) ? (
@@ -848,7 +863,7 @@ export default function Comments({ id }) {
                             {openAlert && 
                             <AlertContainer ref={alertRef}>
                                 <AlertTitle >Borrar comentario</AlertTitle>
-                                <AlertText>¿De verdad quieres borrar tu comentario? Esto no podrá deshacerse.</AlertText >
+                                <AlertText>¿Estás seguro de que deseas eliminar tu comentario? Esta acción no podrá revertirse.</AlertText >
                                 <AlertBtns>
                                     <CancelBtn onClick={handleAlert}>CANCELAR</CancelBtn>
                                     <ConfirmBtn onClick={DeleteComment}>ELIMINAR</ConfirmBtn>
@@ -862,7 +877,7 @@ export default function Comments({ id }) {
                                     <MoreIco width={22} height={22}/>
                                     <p>MÁS</p>
                                 </ContentS>
-                            </Sub>
+                            </Sub>}
                         </div>
                     </UserCommentView>
                 ))}
