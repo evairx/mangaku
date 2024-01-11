@@ -83,8 +83,6 @@ export default async function handler(req, res) {
 
                 const likee = likes ? likes.length : 0;
 
-                console.log(likee)
-
                 function formatLikesCount(likee) {
                     if (likee >= 1000 && likee < 1000000) {
                       return formatNumberWithK(likee, 1000);

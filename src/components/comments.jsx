@@ -8,6 +8,7 @@ import MoreIco from "@/src/icon/More"
 import Liked from "@/src/icon/Liked";
 import Like from "@/src/icon/Like";
 import styled from "@emotion/styled"
+import useClick from "@/src/hooks/useClick";
 
 const Header = styled.main`
     display:flex;
@@ -320,7 +321,120 @@ const ContentS = styled.section`
     display:flex;
     gap:.200rem;
     align-items:center;
+    position:relative;
+    cursor:pointer;
+    height:30px;
+    width:70px;
+    background: ${props => (props.openMore ? 'var(--btn-filter-command)' : 'none')};
+
+    &:hover {
+        background:var(--btn-filter-command);
+    }
 `
+
+const MoreContent = styled.section`
+    background-color: var(--background-nav);
+    position: absolute;
+    top: -45%;
+    left: 105%;
+    transform: translate(-50%, -90%);
+    min-width:150px;
+    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.5);
+`
+
+const MoreBtns = styled.button`
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:.400rem;
+    background:none;
+    width:100%;
+    border:none;
+    font-size: 1.050rem;
+    font-weight: 500;
+    color: var(--color);
+    cursor: pointer;
+    height:40px;
+
+    &:hover {
+        background:var(--btn-filter-command);
+    }
+`
+
+const AlertContainer = styled.section`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-nav);
+    height:200px;
+    padding:1rem;
+    z-index:999;
+    width:400px;
+    text-align:center;
+    z-index: 1001;
+
+    @media screen and (max-width: 653px) {
+        height:230px;
+    }
+
+    @media screen and (max-width: 420px) {
+        height:230px;
+        width:95%;
+    }
+`
+
+const AlertTitle = styled.p`
+    margin-top:.400rem;
+    font-size:1.600rem;
+    font-weight:550;
+
+    @media screen and (max-width: 350px) {
+        font-size:1.200rem;
+    }
+`
+
+const AlertText = styled.p`
+    margin-top:1rem;
+
+    @media screen and (max-width: 653px) {
+        margin-bottom:1rem;
+    }
+
+    @media screen and (max-width: 350px) {
+        font-size:.900rem;
+    }
+`
+
+const AlertBtns = styled.div`
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:1.5rem;
+    gap:.800rem;
+
+    @media screen and (max-width: 653px) {
+        display: initial;
+        width: 100%;
+    }
+`
+
+export const OverLay = styled.section`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    pointer-events: auto;
+    overflow-y: hidden;
+    background: #0000004d;
+    opacity: ${props => (props.openAlert ? 1 : 0)};
+    visibility: ${props => (props.openAlert ? 'visible' : 'hidden')}; 
+    transition: opacity 0.3s ease-out;
+    z-index: 1000;
+`;
+
 
 export default function Comments({ id }) {
     const [user, setUser] = useState({});
@@ -328,6 +442,9 @@ export default function Comments({ id }) {
     const [comments, setComments] = useState({});
     const [actived, setActived] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [moreRef, openMore, setOpenMore] = useClick(null);
+    const [alertRef, openAlert, setOpenAlert] = useClick(null);
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
     const [sortBy, setSortBy] = useState('likeCount');
     const [initialSort, setInitialSort] = useState(true);
     const [cookies] = useCookies(['token']);
@@ -467,9 +584,13 @@ export default function Comments({ id }) {
         });
       };
 
-      const DeleteComment = (commentId) => { 
+      const DeleteComment = () => {
+        if (!selectedCommentId) {
+            return;
+        }
+
         const comentarioData = {
-            commentId: commentId,
+            commentId: selectedCommentId,
         };
 
         fetch('/api/v1/comment/delete', {
@@ -482,7 +603,7 @@ export default function Comments({ id }) {
         .then(response => response.json())
         .then(data => {
             const updatedComments = comments.comments.map(comment => {
-                if (comment._id === commentId) {
+                if (comment._id === selectedCommentId) {
                   return { ...comment, content: "[COMENTARIO ELIMINADO]" };
                 }
                 return comment;
@@ -492,6 +613,9 @@ export default function Comments({ id }) {
                 ...comments,
                 comments: updatedComments,
               });
+
+              setOpenAlert(false)
+              setSelectedCommentId(null); 
         })
         .catch(error => {
           console.error('Error al enviar comentario:', error);
@@ -583,8 +707,21 @@ export default function Comments({ id }) {
         })
     : [];
 
+    function handleMore(commentId) {
+        setOpenMore((prevOpenMore) => {
+            setSelectedCommentId(prevOpenMore === commentId ? commentId : commentId);
+            return prevOpenMore === commentId ? null : commentId;
+        });
+    }
+
+    
+    function handleAlert() {
+        setOpenAlert(!openAlert)
+    }
+
     return (
         <>
+        <OverLay openAlert={openAlert}/>
         { user._id ?
             <ContainerComments isMobile={isMobile}>
                 {isMobile ? undefined :
@@ -688,7 +825,6 @@ export default function Comments({ id }) {
                                     <Name>{comment.username}</Name>
                                     <Date>{comment.date}</Date>
                                 </UserDate>
-                                {user._id && user._id === comment.userId && <p onClick={() => DeleteComment(comment._id)}>Eliminar</p>}
                             </HeaderSub>
                             <p>{comment.content}</p>
                             <Sub>
@@ -709,7 +845,20 @@ export default function Comments({ id }) {
                                     </Content>
                                 </Link>
                             }
-                                <ContentS>
+                            {openAlert && 
+                            <AlertContainer ref={alertRef}>
+                                <AlertTitle >Borrar comentario</AlertTitle>
+                                <AlertText>¿De verdad quieres borrar tu comentario? Esto no podrá deshacerse.</AlertText >
+                                <AlertBtns>
+                                    <CancelBtn onClick={handleAlert}>CANCELAR</CancelBtn>
+                                    <ConfirmBtn onClick={DeleteComment}>ELIMINAR</ConfirmBtn>
+                                </AlertBtns>
+                            </AlertContainer>}
+                                <ContentS openMore={comment._id === openMore} onClick={() => handleMore(comment._id)}>
+                                    {comment._id === openMore && <MoreContent ref={moreRef}>
+                                        <MoreBtns>Reportar</MoreBtns>
+                                        {user._id && user._id === comment.userId && <MoreBtns onClick={handleAlert}>Eliminar</MoreBtns>}
+                                    </MoreContent>}
                                     <MoreIco width={22} height={22}/>
                                     <p>MÁS</p>
                                 </ContentS>

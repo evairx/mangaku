@@ -47,7 +47,7 @@ export default async function handler(req, res) {
                     manga.poster = null;
                 } else {
                     const posterData = await posterResponse.json();
-                    manga.poster = `${serverUrl}/v1/static/poster/${posterId}/${posterData.contents[0]}`;
+                    manga.poster = `/v1/static/poster/${posterId}/${posterData.contents[0]}`;
                 }
             } catch (error) {
                 console.error('Error in poster fetch:', error);
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
                     manga.background = null;
                 } else {
                     const backgroundData = await backgroundResponse.json();
-                    manga.background = `${serverUrl}/v1/static/background/${posterId}/${backgroundData.contents[0]}`;
+                    manga.background = `/v1/static/background/${posterId}/${backgroundData.contents[0]}`;
                 }
             } catch (error) {
                 console.error('Error in background fetch:', error);
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
                     manga.logo = null;
                 } else {
                     const logoData = await logoResponse.json();
-                    manga.logo = `${serverUrl}/v1/static/logo/${posterId}/${logoData.contents[0]}`;
+                    manga.logo = `/v1/static/logo/${posterId}/${logoData.contents[0]}`;
                 }
             } catch (error) {
                 console.error('Error in logo fetch:', error);
