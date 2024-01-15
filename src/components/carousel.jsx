@@ -1,4 +1,5 @@
 import React , { useState, useEffect }from 'react'
+import { useCookies } from 'react-cookie';
 import Helios from "./helios"
 import styled from '@emotion/styled';
 import useQuery from "@/src/hooks/useQuery"
@@ -262,37 +263,68 @@ function Carousel() {
   const isWidth = useQuery('(min-width: 1001px)');
   const isMobile = useQuery('(min-width: 485px)');
   const [loading, setLoading] = useState(true);
+  const [cookies] = useCookies(['token']);
   const [mangas, setMangas] = useState([]);
 
   useEffect(() => {
+    let fetchDataTimeout;
+
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/v1/popular");
+        const token = cookies.token;
+
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch("/api/v1/popular", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        setMangas(data);
 
-        setLoading(false);
+        // Verificar si el array de datos está vacío
+        if (data.length === 0) {
+          // Realizar un nuevo fetch después de un tiempo (por ejemplo, 2000 ms)
+          fetchDataTimeout = setTimeout(() => {
+            setMangas([]);
+            setLoading(false);
+            fetchData();
+          }, 2000);
+        } else {
+          // Si el array no está vacío, actualizar el estado
+          setMangas(data);
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(true);
       }
     };
 
-    fetchData();
-  }, []);
+    // Establecer el estado de loading a true por 2 segundos
+    const loadingTimeout = setTimeout(() => setLoading(true), 2000);
 
-  useEffect(() => {
-    if(mangas.length === 0) {
-      setLoading(true);
-    }
-  }, [mangas]);
+    // Llamar a fetchData después de 2 segundos
+    fetchDataTimeout = setTimeout(() => {
+      clearTimeout(loadingTimeout); // Limpiar el temporizador de loading
+      fetchData();
+    }, 2000);
 
-  console.log(mangas)
+    // Limpiar los temporizadores antes de desmontar el componente
+    return () => {
+      clearTimeout(fetchDataTimeout);
+      clearTimeout(loadingTimeout);
+    };
+  }, [cookies.token]);
+
 
   return (
         <>

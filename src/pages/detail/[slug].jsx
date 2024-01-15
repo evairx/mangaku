@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
 import styled from '@emotion/styled';
@@ -62,16 +63,19 @@ const Bar = styled.span`
   }
 `;
 
-export default function Detail({token}) {
+export default function Detail() {
     const [manga, setManga] = useState({});
     const [page, setPage] = useState(2);
     const [loading, setLoading] = useState(true);
+    const [cookies] = useCookies(['token']);
     const router = useRouter();
     const { slug } = router.query;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const token = cookies.token;
+                
                 await fetch(`/api/v1/manga/${slug}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -141,14 +145,4 @@ export default function Detail({token}) {
             </div>}
         </Layout>
     );
-}
-
-export async function getServerSideProps() {
-    const token = process.env.TOKEN;
-
-    return {
-        props: {
-            token,
-        },
-    };
 }

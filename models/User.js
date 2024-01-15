@@ -44,6 +44,11 @@ const UserSchema = new Schema({
         default: 0,
     },
     favorites: [favoritesSchema],
+    ban: {
+        type: Boolean,
+        default: false,
+        required: false,
+    },
     date: {
         type: Date,
         default: Date.now

@@ -23,12 +23,9 @@ export default async function handler(req, res) {
       const token = req.headers.authorization.split(" ")[1];
 
       const decodedToken = jwt.verify(token, process.env.SECRET);
-      const userId = decodedToken.id;
 
-      const user = await UserModel.findById(userId);
-
-      if (!user) {
-          return res.status(401).json({ message: "Usuario no encontrado" });
+      if (!(decodedToken.status === "OFFLINE" || decodedToken.status === "ACTIVE")) {
+          res.status(400).json({ not_allowed: {} });
       }
   
       const mangas = await Manga.findOne({ titleslug: slug });
@@ -55,9 +52,9 @@ export default async function handler(req, res) {
           const posterId = manga._id;
   
           try {
-              const posterResponse = await fetch(`${serverUrl}/v1/api/poster/${posterId}`, {
+              const posterResponse = await fetch(`/v1/api/poster/${posterId}`, {
                   headers: {
-                      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwNDEzMzc3NX0.wMlx3ErAX05cct6zSOeT-yWm59kmsbmyOCu47_Cn3uE'
+                      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1Mjc4NjE2fQ.mYprTIZNuNIxfhcgQ0CFgiEejWqdflwhG7suEHYm3jk'
                   }
               });
   

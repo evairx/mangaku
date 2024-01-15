@@ -456,6 +456,7 @@ export default function Comments({ id }) {
     const [sortBy, setSortBy] = useState('likeCount');
     const [initialSort, setInitialSort] = useState(true);
     const [cookies] = useCookies(['token']);
+    const [, , removeCookieFromSecond] = useCookies(['token']);
     const isMobile = useQuery('(max-width: 653px)');
 
     const maxLength = 450;
@@ -481,6 +482,7 @@ export default function Comments({ id }) {
               })
               .catch(error => {
                 console.error(error);
+                removeCookieFromSecond('token');
                 setLoading(true);
               });
         } catch (error) {
@@ -517,6 +519,7 @@ export default function Comments({ id }) {
                   setUser(data);
                 } catch (error) {
                   console.error(error);
+                  removeCookieFromSecond('token');
                 } finally {
                   setLoading(false);
                 }

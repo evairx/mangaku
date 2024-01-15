@@ -17,6 +17,7 @@ import SearchIco from "../icon/search";
 export default function Menu({ handleDark, handleLight, handleSystem }) {
     const [user, setUser] = useState({});
     const [cookies] = useCookies(['token']);
+    const [, , removeCookieFromSecond] = useCookies(['token']);
     const [userRef, openUser, setOpenUser] = useClick(false);
     const [themeRef, openTheme, setOpenTheme] = useClick(false);
     const [loading, setLoading] = useState(true);
@@ -59,6 +60,7 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                 setUser(data);
             } catch (error) {
                 console.error(error);
+                removeCookieFromSecond('token');
             } finally {
                 setLoading(false);
             }

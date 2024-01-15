@@ -9,7 +9,21 @@ export default async function handler(req, res) {
     const { method } = req;
 
     if (method === "GET") {
+
+        if(req.headers.authorization === undefined) {
+            res.status(400).json({ not_auth_token: {} });
+            return;
+        }
+
         await Connect();
+
+        const token = req.headers.authorization.split(" ")[1];
+
+        const decodedToken = jwt.verify(token, process.env.SECRET);
+
+        if (!(decodedToken.status === "OFFLINE" || decodedToken.status === "ACTIVE")) {
+            res.status(400).json({ not_allowed: {} });
+        }
 
         const mangas = await Manga.find().sort({ views: -1 }).limit(5);
 
@@ -18,7 +32,7 @@ export default async function handler(req, res) {
             return;
         }
 
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMjc4MDcxN30.8nm2Ei5o-y9B9AbM1B-t46K3ov_hd1hcyJufnjG50y8";
+        const tokenAdmin = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1Mjc4NjE2fQ.mYprTIZNuNIxfhcgQ0CFgiEejWqdflwhG7suEHYm3jk";
 
         const mappedMangas = mangas.map(async (manga) => {
             const formatId = manga.format;
@@ -39,7 +53,7 @@ export default async function handler(req, res) {
             try {
                 const posterResponse = await fetch(`${serverUrl}/v1/api/poster/${posterId}`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${tokenAdmin}`
                     }
                 });
             
@@ -57,7 +71,7 @@ export default async function handler(req, res) {
             try {
                 const backgroundResponse = await fetch(`${serverUrl}/v1/api/background/${posterId}`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${tokenAdmin}`
                     }
                 });
             
@@ -75,7 +89,7 @@ export default async function handler(req, res) {
             try {
                 const logoResponse = await fetch(`${serverUrl}/v1/api/logo/${posterId}`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${tokenAdmin}`
                     }
                 });
             
