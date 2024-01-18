@@ -28,12 +28,15 @@ export default async function handler(req, res) {
           res.status(400).json({ not_allowed: {} });
       }
   
-      const mangas = await Manga.findOne({ titleslug: slug });
+      const mangas = await Manga.findOne({ titleslug: slug })
       
       if (!mangas || (Array.isArray(mangas) && mangas.length === 0)) {
           res.status(200).json({});
           return;
       }
+
+      mangas.views += 0.5;
+      mangas.save();
   
       const processManga = async (manga) => {
           const formatId = manga.format;
@@ -125,6 +128,20 @@ export default async function handler(req, res) {
               return dislikee.toString();
             }
           }
+
+          const views = Math.floor(manga.views);
+
+          function formatViews(views) {
+            if (views >= 1000 && views < 1000000) {
+              return formatNumberWithK(views, 1000);
+            } else if (views >= 1000000 && views < 1000000000) {
+              return formatNumberWithM(views, 1000000);
+            } else if (views >= 1000000000) {
+              return formatNumberWithM(views, 1000000000);
+            } else {
+              return views.toString();
+            }
+          }
           
           function formatNumberWithK(number, divisor) {
             if (number % divisor === 0) {
@@ -136,27 +153,39 @@ export default async function handler(req, res) {
             }
           }
 
+          function formatNumberWithM(number, divisor) {
+            if (number % divisor === 0) {
+              return (number / divisor) + ' M';
+            } else if ((number % divisor) % 100 === 0) {
+              return (number / divisor).toFixed(1) + ' M';
+            } else {
+              return (number / divisor).toFixed(1).replace(/\.0$/, '') + ' M';
+            }
+          }
+
         const likeCount = formatLikesCount(likee);
         const disLikeCount = formatdisLikesCount(dislikee);
 
-          return {
-              _id: manga._id,
-              title: manga.title,
-              titleJp: manga.titleJp,
-              author: manga.author,
-              poster: manga.poster,
-              background: manga.background,
-              overview: manga.overview,
-              format: manga.format,
-              likes: manga.likes,
-              likeCount: likeCount,
-              disLikeCount: disLikeCount,
-              dislikes: manga.dislikes,
-              views: manga.views,
-              genres: manga.genres,
-              status: manga.status,
-              date: manga.date
-          };
+        const viewsCount = formatViews(views);
+
+        return {
+          _id: manga._id,
+          title: manga.title,
+          titleJp: manga.titleJp,
+          author: manga.author,
+          poster: manga.poster,
+          background: manga.background,
+          overview: manga.overview,
+          format: manga.format,
+          likes: manga.likes,
+          likeCount: likeCount,
+          disLikeCount: disLikeCount,
+          dislikes: manga.dislikes,
+          views: viewsCount,
+          genres: manga.genres,
+          status: manga.status,
+          date: manga.date
+        };
       };
   
       const response = Array.isArray(mangas) ? await Promise.all(mangas.map(processManga)) : await processManga(mangas);

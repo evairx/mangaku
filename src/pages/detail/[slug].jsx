@@ -6,6 +6,7 @@ import Like from "@/src/icon/Like";
 import Liked from "@/src/icon/Liked";
 import Dislike from "@/src/icon/dislike";
 import Disliked from "@/src/icon/disliked";
+import View from "@/src/icon/view";
 import jwt from "jsonwebtoken"
 import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
@@ -440,6 +441,10 @@ export default function Detail() {
                         )}
                         <p>{manga?.disLikeCount}</p>
                       </Btns>
+                      <Btns>
+                        <View width={22} height={22}/>
+                        <p>{manga?.views}</p>
+                      </Btns>
                     </BtnsContent>
                     :
                     <BtnsContent>
@@ -455,6 +460,10 @@ export default function Detail() {
                         <p>{manga?.disLikeCount}</p>
                       </Btns>
                     </Link>
+                    <Btns>
+                      <View width={22} height={22}/>
+                      <p>{manga?.views}</p>
+                    </Btns>
                   </BtnsContent>
                   }
                   <GenresContent>
