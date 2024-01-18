@@ -1,6 +1,6 @@
 import Connect from "@/db/connect";
 import Genres from "@/models/Genres";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Collection";
 import jwt from "jsonwebtoken"
 
 export default async function handler(req, res) {

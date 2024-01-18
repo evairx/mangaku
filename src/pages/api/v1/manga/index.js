@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Collection";
 import Genres from '@/models/Genres';
 import Format from '@/models/Format';
 import Status from '@/models/Status';
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
             try {
                 const posterResponse = await fetch(`${serverUrl}/v1/api/poster/${posterId}`, {
                     headers: {
-                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMmFmNmU4LTIzYzItNDI1NS1hZWU2LTQyZjJmOGFkNjVkNiIsImlhdCI6MTcwMDc5NTczOSwiZXhwIjoxNzAzNDIzNzM5fQ.XxlDFjKvsKp3Pcp8uabPTivr9oN3-4JveXiFjCOLmGc'
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1NTIxNDY3fQ.Yj42p_D5xQelY-qxxYMh3zH35CavXNbMOEYrRDk7wok'
                     }
                 });
 

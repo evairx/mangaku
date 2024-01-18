@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Collection";
 
 export default async function handler(req, res) {
     const { method } = req;

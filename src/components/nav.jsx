@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCookies } from 'react-cookie';
+import useQuery from "../hooks/useQuery";
 import jwt from "jsonwebtoken"
 import * as Style from "@/src/styles/navStyle"
 import Link from "next/link";
@@ -14,7 +15,7 @@ import SystemIco from '@/src/icon/systemIco'
 import Theme from "@/src/icon/theme"
 import SearchIco from "../icon/search";
 
-export default function Menu({ handleDark, handleLight, handleSystem }) {
+function MenuDesktop({ handleDark, handleLight, handleSystem }) {
     const [user, setUser] = useState({});
     const [cookies] = useCookies(['token']);
     const [, , removeCookieFromSecond] = useCookies(['token']);
@@ -193,6 +194,17 @@ export default function Menu({ handleDark, handleLight, handleSystem }) {
                     <Style.OverLay openUser={openUser}/>
                 </Style.Content>
             </Style.Nav>
+            <Style.Space/>
+        </>
+    )
+}
+
+export default function Menu({handleDark, handleLight, handleSystem}) {
+    const isMobile = useQuery('(max-width: 850px)');
+
+    return(
+        <>
+            {isMobile ? undefined: <MenuDesktop handleDark={handleDark} handleLight={handleLight} handleSystem={handleSystem}/>}
         </>
     )
 }

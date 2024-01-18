@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Collection";
 import Comment from "@/models/Comment";
 import UserModel from "@/models/User";
 import jwt from "jsonwebtoken";

@@ -323,3 +323,9 @@ export const OverLay = styled.section`
     transition: opacity 0.3s ease-out;
     z-index: 998;
 `;
+
+
+export const Space = styled.div`
+    height: 3.5rem;
+    background-color: var(--background-nav);
+`;

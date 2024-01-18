@@ -41,6 +41,8 @@ const View = styled.section`
     width: 70%;
     margin: 0 auto;
     transition: all .3s ease;
+    margin-bottom:20px;
+    
     @media screen and (max-width: 1400px) {
         width: 85%;
     }
@@ -52,7 +54,6 @@ const View = styled.section`
 
 const ViewComment = styled.div`
     width: 100%;
-
 `
 
 const UserCommentView = styled.div`
@@ -112,12 +113,12 @@ const Content = styled.div`
 `
 
 const ContainerComments = styled.div`
-    margin-top: 1rem;
     display:flex;
     justify-content:center;
     align-items:center;
     min-height: ${props => (props.isMobile ? 'auto' : '155px')};
     gap:.900rem;
+    
 
     @media screen and (max-width: 653px) {
         padding: 1rem;
@@ -272,19 +273,27 @@ const TextArea = styled.textarea`
   form-sizing: content;
   background-color: var(--background-nav);
   color: var(--color);
-  transition: all .3s ease;
+  transition: ${props => (props.actived ? 'all .3s ease' : 'none')};
+`
 
-  @media screen and (max-width: 1400px) {
+const TextAreaMobile = styled.textarea`
+    resize: none;
     width: 600px;
+    padding: .400rem;
+    outline: none;
+    height: ${props => (props.actived ? '80px' : '35px')};
+    form-sizing: content;
+    background-color: var(--background-nav);
+    color: var(--color);
+    transition: ${props => (props.actived ? 'all .3s ease' : 'none')};
+
+    @media screen and (max-width: 850px) {
+        width: 500px;
     }
-
-   @media screen and (max-width: 850px) {
-    width: 500px;
-   }
-
-   @media screen and (max-width: 653px) {
+    
+    @media screen and (max-width: 653px) {
     width: 100%;
-   }
+    }
 `
 
 const MobileName = styled.div`
@@ -362,16 +371,16 @@ const MoreBtns = styled.button`
 `
 
 const AlertContainer = styled.section`
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-nav);
-    height:200px;
-    padding:1rem;
-    z-index:999;
-    width:400px;
-    text-align:center;
+    height: 200px;
+    padding: 1rem;
+    z-index: 999;
+    width: 400px;
+    text-align: center;
     z-index: 1001;
 
     @media screen and (max-width: 653px) {
@@ -443,6 +452,28 @@ export const OverLay = styled.section`
     z-index: 1000;
 `;
 
+const Spinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 4px solid var(--main);
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`
+
+const Div = styled.main`
+  display:flex;
+  justify-content: center;
+  align-items:center;
+  height:20lvh;
+`
+
+
 
 export default function Comments({ id }) {
     const [user, setUser] = useState({});
@@ -458,38 +489,40 @@ export default function Comments({ id }) {
     const [cookies] = useCookies(['token']);
     const [, , removeCookieFromSecond] = useCookies(['token']);
     const isMobile = useQuery('(max-width: 653px)');
+    const isTextAreaMobile = useQuery('(max-width: 888px)');
 
     const maxLength = 450;
 
-    const fetchData = async () => {
-        const token = cookies.token;
+    useEffect(() => {
+        const fetchData = async () => {
+            const token = cookies.token;
 
-        try {
-            await fetch(`/api/v1/comment/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                  }
-            })
-            .then(response => {
-                if (!response.ok) {
-                  throw new Error(response.statusText);
-                }
-                return response.json();
-              })
-              .then(data => {
-                setComments(data);
-                setLoading(false);
-              })
-              .catch(error => {
+            try {
+                await fetch(`/api/v1/reviews/comment/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                    throw new Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    setComments(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                    removeCookieFromSecond('token');
+                });
+            } catch (error) {
                 console.error(error);
-                removeCookieFromSecond('token');
-                setLoading(true);
-              });
-        } catch (error) {
-            console.error(error);
-            setLoading(true);
+            }
         }
-    }
+
+        fetchData();
+    }, [id, cookies.token]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -531,10 +564,8 @@ export default function Comments({ id }) {
               setLoading(true); 
             }
         }
-
-        fetchData();
         fetchUser();
-    }, []);
+    }, [cookies.token]);
 
     const autoresize = (event) => {
         const textarea = event.target;
@@ -561,7 +592,7 @@ export default function Comments({ id }) {
 
         const token = cookies.token;
 
-        fetch('/api/v1/comment/add', {
+        fetch('/api/v1/reviews/comment/add', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -610,7 +641,7 @@ export default function Comments({ id }) {
 
         const token = cookies.token;
 
-        fetch('/api/v1/comment/delete', {
+        fetch('/api/v1/reviews/comment/delete', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -687,7 +718,7 @@ export default function Comments({ id }) {
 
         const token = cookies.token;
   
-        fetch('/api/v1/comment/votes', {
+        fetch('/api/v1/reviews/comment/votes', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -740,78 +771,103 @@ export default function Comments({ id }) {
     return (
         <>
         <OverLay openAlert={openAlert}/>
-        { user._id ?
-            <ContainerComments isMobile={isMobile}>
-                {isMobile ? undefined :
-                <>
-                    {loading ?
-                    <p>cargando</p>:
-                    <Avatar>
-                        <figure>
-                            {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username}/>}
-                        </figure>
-                    </Avatar>}
-                </>
-                }
-                <div>
-                    <CommentHeaderTitles>
-                        {isMobile ?
-                        <MobileName>
-                            <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username} style={{borderRadius: '50%'}} width={30} height={30}/>
-                            <CommentTile>Comentar como {user.username}</CommentTile>
-                        </MobileName>:
-                        <CommentTile>Comentar como {user.username}</CommentTile>
-                        }
-                        {isMobile ? undefined :
+        {Object.keys(comments).length === 0 ? undefined:
+            <>
+            { user._id ?
+                <ContainerComments isMobile={isMobile}>
+                    {isMobile ? undefined :
+                    <>
+                        {loading ?
+                        <p>cargando</p>:
+                        <Avatar>
+                            <figure>
+                                {user.avatar && <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username}/>}
+                            </figure>
+                        </Avatar>}
+                    </>
+                    }
+                    <div>
                         <CommentHeaderTitles>
-                            {actived &&
-                            <>
-                                <p style={comment.length > maxLength ? {color: 'var(--main)'} : {}}>{comment.length}</p>
-                                <p>/</p>
-                                <p>{maxLength}</p>
-                            </>}
-                        </CommentHeaderTitles>}
-                    </CommentHeaderTitles>
-                    <TextArea
-                        actived={actived}
-                        placeholder='Deja tu comentario'
-                        value={comment}
-                        onClick={handleActive}
-                        onChange={autoresize}
-                        maxLength="1500"
-                    />
-                    {actived && 
-                        <CommentButtons>
-                            <SpoilerContent>
-                                <div style={{display: 'flex',gap: '.400rem'}}>
-                                    <input type="checkbox" /> <p>Marcar como spoiler</p>
-                                </div>
-                                {isMobile && <div style={{display: 'flex',gap: '.400rem'}}>
+                            {isMobile ?
+                            <MobileName>
+                                <img src={`/v1/static/avatar/${user.avatar}`} alt={user.username} style={{borderRadius: '50%'}} width={30} height={30}/>
+                                <CommentTile>Comentar como {user.username}</CommentTile>
+                            </MobileName>:
+                            <CommentTile>Comentar como {user.username}</CommentTile>
+                            }
+                            {isMobile ? undefined :
+                            <CommentHeaderTitles>
+                                {actived &&
+                                <>
                                     <p style={comment.length > maxLength ? {color: 'var(--main)'} : {}}>{comment.length}</p>
                                     <p>/</p>
                                     <p>{maxLength}</p>
-                                </div>}
-                            </SpoilerContent>
-                            <Btns>
-                                <CancelBtn onClick={handleCancel}>Cancelar</CancelBtn>
-                                {comment.length === 0 || comment.length > maxLength ?
-                                    <ConfirmBtnDisabled>Comentar</ConfirmBtnDisabled>
-                                    :
-                                    <ConfirmBtn onClick={submitHandlet}>Comentar</ConfirmBtn>
-                                }
-                            </Btns>
-                        </CommentButtons>
-                    }
-                </div>
-            </ContainerComments>
-            :
-            <ContainerComments>
-                <CommentArea>
-                    <h2>Se requiere una cuenta</h2>
-                    <p>Por favor accede o Crea una cuenta para comentar</p>
-                </CommentArea>
-            </ContainerComments>
-        }
+                                </>}
+                            </CommentHeaderTitles>}
+                        </CommentHeaderTitles>
+                        {isTextAreaMobile ? 
+                        <TextAreaMobile
+                            actived={actived}
+                            placeholder='Deja tu comentario'
+                            value={comment}
+                            onClick={handleActive}
+                            onChange={autoresize}
+                            maxLength="1500"
+                        />
+                        :
+                        <TextArea
+                            actived={actived}
+                            placeholder='Deja tu comentario'
+                            value={comment}
+                            onClick={handleActive}
+                            onChange={autoresize}
+                            maxLength="1500"
+                        />}
+                        {actived && 
+                            <CommentButtons>
+                                <SpoilerContent>
+                                    <div style={{display: 'flex',gap: '.400rem'}}>
+                                        <input type="checkbox" /> <p>Marcar como spoiler</p>
+                                    </div>
+                                    {isMobile && <div style={{display: 'flex',gap: '.400rem'}}>
+                                        <p style={comment.length > maxLength ? {color: 'var(--main)'} : {}}>{comment.length}</p>
+                                        <p>/</p>
+                                        <p>{maxLength}</p>
+                                    </div>}
+                                </SpoilerContent>
+                                <Btns>
+                                    <CancelBtn onClick={handleCancel}>Cancelar</CancelBtn>
+                                    {comment.length === 0 || comment.length > maxLength ?
+                                        <ConfirmBtnDisabled>Comentar</ConfirmBtnDisabled>
+                                        :
+                                        <ConfirmBtn onClick={submitHandlet}>Comentar</ConfirmBtn>
+                                    }
+                                </Btns>
+                            </CommentButtons>
+                        }
+                    </div>
+                </ContainerComments>
+                :
+                <ContainerComments>
+                    <CommentArea>
+                        <h2>Se requiere una cuenta</h2>
+                        <p>Por favor accede o Crea una cuenta para comentar</p>
+                    </CommentArea>
+                </ContainerComments>
+            }
+        </>}
+        
+       
+        {openAlert && 
+            <AlertContainer ref={alertRef}>
+                <AlertTitle >Borrar comentario</AlertTitle>
+                <AlertText>¿Estás seguro de que deseas eliminar tu comentario? Esta acción no podrá revertirse.</AlertText >
+                <AlertBtns>
+                    <CancelBtn onClick={handleAlert}>CANCELAR</CancelBtn>
+                    <ConfirmBtn onClick={DeleteComment}>ELIMINAR</ConfirmBtn>
+                </AlertBtns>
+            </AlertContainer>}
+        
 
         <Header isMobile={isMobile}>
             <h2>{comments.count ? comments.count: '0'} Comentario{comments?.count > 1 && 's'}</h2>
@@ -821,7 +877,7 @@ export default function Comments({ id }) {
             </ButtonFilter >
         </Header>
 
-        <View>
+        {Object.keys(comments).length === 0 ? <Div><Spinner/></Div>:<View>
             <ViewComment>
                 {sortedComments.map((comment, index) => (
                     <UserCommentView style={{background: comment.new === true && 'var(--background-nav)', padding: comment.new === true && '10px'}} key={index}>
@@ -863,15 +919,6 @@ export default function Comments({ id }) {
                                     </Content>
                                 </Link>
                             }
-                            {openAlert && 
-                            <AlertContainer ref={alertRef}>
-                                <AlertTitle >Borrar comentario</AlertTitle>
-                                <AlertText>¿Estás seguro de que deseas eliminar tu comentario? Esta acción no podrá revertirse.</AlertText >
-                                <AlertBtns>
-                                    <CancelBtn onClick={handleAlert}>CANCELAR</CancelBtn>
-                                    <ConfirmBtn onClick={DeleteComment}>ELIMINAR</ConfirmBtn>
-                                </AlertBtns>
-                            </AlertContainer>}
                                 <ContentS openMore={comment._id === openMore} onClick={() => handleMore(comment._id)}>
                                     {comment._id === openMore && <MoreContent ref={moreRef}>
                                         <MoreBtns>Reportar</MoreBtns>
@@ -886,7 +933,7 @@ export default function Comments({ id }) {
                 ))}
                 {comments.count === 0 && <p>No hay comentarios</p>}
             </ViewComment>
-        </View>
+        </View>}
         </>
     )
 }

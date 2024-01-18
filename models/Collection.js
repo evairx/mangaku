@@ -2,7 +2,7 @@ import { Schema, models, model } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import slugify from 'slugify';
 
-const MangaSchema = new Schema({
+const CollectionSchema = new Schema({
   _id: {
     type: String,
     default: uuidv4,
@@ -44,6 +44,18 @@ const MangaSchema = new Schema({
     type: Number,
     default: 0,
   },
+  likes: [
+    {
+        type: String,
+        required: false,
+    }
+  ],
+  dislikes: [
+    {
+        type: String,
+        required: false,
+    }
+  ],
   nsfw: {
     type: Boolean,
   },
@@ -56,7 +68,7 @@ const MangaSchema = new Schema({
   versionKey: false,
 });
 
-MangaSchema.pre("save", function(next) {
+CollectionSchema.pre("save", function(next) {
   const isModified = this.isModified("title");
   if (isModified) {
       this.titleslug = slugify(this.title, {remove: /[%\<>#',.!?:]/gi, lower: true });
@@ -64,4 +76,4 @@ MangaSchema.pre("save", function(next) {
   next();
 });
 
-export default models.Manga || model('Manga', MangaSchema);
+export default models.Collection || model('Collection', CollectionSchema);

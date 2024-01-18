@@ -50,6 +50,7 @@ export const createFormat = async () => {
         new Format({ name: "Manga" }).save(),
         new Format({ name: "Novela Ligera" }).save(),
         new Format({ name: "One Shot" }).save(),
+        new Format({ name: "Manhwa" }).save(),
       ]);
   
       console.log(values);
@@ -58,7 +59,7 @@ export const createFormat = async () => {
     }
 };
 
-export const createGenres = async () => {
+const createGenres = async () => {
     try {
       const count = await Genres.estimatedDocumentCount();
   
@@ -83,6 +84,9 @@ export const createGenres = async () => {
         new Genres({ name: "Deportes" }).save(),
         new Genres({ name: "Sobrenatural" }).save(),
         new Genres({ name: "Suspenso" }).save(),
+        new Genres({ name: "Erótico" }).save(),
+        new Genres({ name: "Boys' Love" }).save(),
+        new Genres({ name: "Violencia sexual" }).save(),
       ]);
   
       console.log(values);
@@ -90,3 +94,5 @@ export const createGenres = async () => {
       console.error(error);
     }
 };
+
+createGenres()

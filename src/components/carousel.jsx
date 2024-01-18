@@ -297,7 +297,7 @@ function Carousel() {
             setMangas([]);
             setLoading(false);
             fetchData();
-          }, 2000);
+          }, 500);
         } else {
           // Si el array no está vacío, actualizar el estado
           setMangas(data);
@@ -316,7 +316,7 @@ function Carousel() {
     fetchDataTimeout = setTimeout(() => {
       clearTimeout(loadingTimeout); // Limpiar el temporizador de loading
       fetchData();
-    }, 2000);
+    }, 500);
 
     // Limpiar los temporizadores antes de desmontar el componente
     return () => {
@@ -365,7 +365,7 @@ function Carousel() {
               </Logo></Link>
                 {isWidth && <Text>{manga.overview}</Text>}
               <div>
-              <Link href={`/detail/${manga.slug}`}><Button>Empezar a leer</Button></Link>
+              <Link href={`/${manga.format.toLowerCase()}/${manga._id}?page=1`}><Button>Empezar a leer</Button></Link>
               </div>
             </Info>
             <Figure>

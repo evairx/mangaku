@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga/";
+import Manga from "@/models/Collection";
 import Genres from '@/models/Genres';
 import Format from '@/models/Format';
 import Status from '@/models/Status';

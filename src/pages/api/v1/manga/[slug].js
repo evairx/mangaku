@@ -1,5 +1,5 @@
 import Connect from "@/db/connect";
-import Manga from "@/models/Manga";
+import Manga from "@/models/Collection";
 import Genres from '@/models/Genres';
 import Format from '@/models/Format';
 import Status from '@/models/Status';
@@ -52,9 +52,9 @@ export default async function handler(req, res) {
           const posterId = manga._id;
   
           try {
-              const posterResponse = await fetch(`/v1/api/poster/${posterId}`, {
+              const posterResponse = await fetch(`${serverUrl}/v1/api/poster/${posterId}`, {
                   headers: {
-                      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1Mjc4NjE2fQ.mYprTIZNuNIxfhcgQ0CFgiEejWqdflwhG7suEHYm3jk'
+                      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1NTIxNDY3fQ.Yj42p_D5xQelY-qxxYMh3zH35CavXNbMOEYrRDk7wok'
                   }
               });
   
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
                   }
               } else {
                   const posterData = await posterResponse.json();
-                  manga.poster = `${serverUrl}/v1/static/poster/${posterId}/${posterData.contents[0]}`;
+                  manga.poster = `/v1/static/poster/${posterId}/${posterData.contents[0]}`;
               }
           } catch (error) {
               console.error('Error en la solicitud fetch:', error);
@@ -87,13 +87,58 @@ export default async function handler(req, res) {
                 manga.background = null;
             } else {
                 const backgroundData = await backgroundResponse.json();
-                manga.background = `${serverUrl}/v1/static/background/${posterId}/${backgroundData.contents[0]}`;
+                manga.background = `/v1/static/background/${posterId}/${backgroundData.contents[0]}`;
             }
         } catch (error) {
             console.error('Error in background fetch:', error);
             manga.background = null;
         }
-  
+
+        const likes = manga.likes;
+
+        const dislikes = manga.dislikes;
+
+        const likee = likes ? likes.length : 0;
+        
+        const dislikee = dislikes ? dislikes.length : 0;
+
+        function formatLikesCount(likee) {
+            if (likee >= 1000 && likee < 1000000) {
+              return formatNumberWithK(likee, 1000);
+            } else if (likee >= 1000000 && likee < 1000000000) {
+              return formatNumberWithK(likee, 1000000);
+            } else if (likee >= 1000000000) {
+              return formatNumberWithK(likee, 1000000000);
+            } else {
+              return likee.toString();
+            }
+          }
+
+        function formatdisLikesCount(dislikee) {
+            if (dislikee >= 1000 && dislikee < 1000000) {
+              return formatNumberWithK(dislikee, 1000);
+            } else if (dislikee >= 1000000 && dislikee < 1000000000) {
+              return formatNumberWithK(dislikee, 1000000);
+            } else if (dislikee >= 1000000000) {
+              return formatNumberWithK(dislikee, 1000000000);
+            } else {
+              return dislikee.toString();
+            }
+          }
+          
+          function formatNumberWithK(number, divisor) {
+            if (number % divisor === 0) {
+              return (number / divisor) + ' K';
+            } else if ((number % divisor) % 100 === 0) {
+              return (number / divisor).toFixed(1) + ' K';
+            } else {
+              return (number / divisor).toFixed(1).replace(/\.0$/, '') + ' K';
+            }
+          }
+
+        const likeCount = formatLikesCount(likee);
+        const disLikeCount = formatdisLikesCount(dislikee);
+
           return {
               _id: manga._id,
               title: manga.title,
@@ -103,6 +148,11 @@ export default async function handler(req, res) {
               background: manga.background,
               overview: manga.overview,
               format: manga.format,
+              likes: manga.likes,
+              likeCount: likeCount,
+              disLikeCount: disLikeCount,
+              dislikes: manga.dislikes,
+              views: manga.views,
               genres: manga.genres,
               status: manga.status,
               date: manga.date
