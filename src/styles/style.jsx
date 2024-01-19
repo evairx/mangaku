@@ -31,6 +31,7 @@ export default function GlobalStyles({theme}) {
       --btn-hover: ${theme === "--dark" ? "#ffffff23": "#00000023"}; 
       --skeleton-color: ${theme === "--dark" ? "hsla(199, 20%, 70%, 0.288)": "hsla(195, 6%, 25%, 0.288)"};
       --skeleton-color-100: ${theme === "--dark" ? "hsla(204, 20%, 95%, 0.685)": "hsla(210, 3%, 25%, 0.685)"};
+      --genres:${theme === "--dark" ? "#1a1c20": "#b7b7b7"};
       --helios-indicator-active: ${theme === "--dark" ? "rgba(255, 255, 255, 0.497)": "rgba(0, 0, 0, 0.497)"};
       --helios-gradient-1:${theme === "--dark" ? "#00000036": "#ffffff36"};
       --helios-gradient-2:${theme === "--dark" ? "#0000005d": "#ffffff5d"};
@@ -38,7 +39,11 @@ export default function GlobalStyles({theme}) {
       --helios-gradient-1a:${theme === "--dark" ? "#0000002d": "#ffffff2d"};
       --helios-gradient-2a:${theme === "--dark" ? "#0000008e": "#ffffff8e"};
       --helios-gradient-3a:${theme === "--dark" ? "#000000c2": "#ffffffc2"};
-      
+      --details-gradient:${theme === "--dark" ? "#0000008d": "#ffffff8d"};
+      --details-gradient-1:${theme === "--dark" ? "#000000ae": "#ffffffae"};
+      --details-gradient-2:${theme === "--dark" ? "#000000d6": "#ffffffd6"};
+      --details-gradient-3:${theme === "--dark" ? "#000000e8": "#ffffffe8"};
+      --details-gradient-4:${theme === "--dark" ? "#000000": "#ffffff"};
     }
 
     * {

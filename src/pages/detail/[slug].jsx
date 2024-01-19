@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import useQuery from "@/src/hooks/useQuery"
 import { useCookies } from 'react-cookie';
 import Like from "@/src/icon/Like";
 import Liked from "@/src/icon/Liked";
@@ -37,31 +38,43 @@ const BtnsContent = styled.div`
 `
 
 const BackgroundMobile = styled.figure`
-  position:absolute;
-  top:0;
-  left:0;
-  z-index:-10;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  filter:blur(20px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -10;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
   img {
-     height: 100%;
-     width: 100%;
-     object-fit: cover; 
-     object-position: center top;
-   }
-`
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(var(--details-gradient), var(--details-gradient-1),var(--details-gradient-2), var(--details-gradient-3), var(--details-gradient-4));
+    z-index: 0; /* Capa del fondo */
+  }
+`;
 
 const PictureMobile = styled.figure`
   width: 230px;
   height:auto;
   z-index:1;
-  margin-top:1rem;
+  margin-top:2rem;
   overflow:hidden;
   -webkit-box-shadow: 0px 0px 15px -4px #000000; 
   box-shadow: 0px 0px 15px 0px #000000;
-  border-radius:10px;
+  border-radius:2px;
+  margin-bottom:20px;
+  
    
   img {
     width:100%;
@@ -72,7 +85,7 @@ const PictureMobile = styled.figure`
 `
 
 const Info = styled.div`
-  padding:.800rem 1rem;
+  padding:0 .800rem;
   width:100%;
 `
 
@@ -93,23 +106,51 @@ const GenresContent = styled.div`
 `
 
 const Genres = styled.span`
-  background:var(--main-);
-  font-size:.900rem;
+  background:var(--genres);
+  font-size:.825rem;
   padding:.200rem .600rem;
   border-radius: 0 10px 0 10px;
 `
 const OverViewMobile = styled.p`
   width:100%;
-  font-size: 1.050rem;
+  font-size: .875rem;
+  line-height: 1.25rem;
   font-weight:400;
   color:var(--color);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: ${props => (props.more ? 'none' : '3')};
   -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: normal;
-  text-overflow: ellipsis;
+  ${props => (props.more ? '' : 'white-space: normal;')}
+  ${props => (props.more ? '' : 'text-overflow: ellipsis;')}
   margin-top:1rem;
+  position:relative;
+
+  ${props => (props.more ? '' : '&::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(transparent, transparent, var(--details-gradient-4)); z-index: 0; }')}
+`
+
+const MoreBtn = styled.div`
+  position: relative;
+  font-weight:400;
+  font-size: 0.965rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align:center;
+  margin-top:6px;
+  opacity:.7;
+`;
+
+const Infox = styled.div`
+  display:flex;
+  justify-content:space-between; 
+`
+
+const Border = styled.div`
+    border: 1px solid var(--border);
+    margin-top:10px;
+    margin-bottom:10px;
+    border-radius:8px;
 `
 
 const ContentLoad = styled.div`
@@ -162,10 +203,26 @@ const Bar = styled.span`
 `;
 
 export default function Detail() {
+  const isMobile = useQuery('(min-width: 850px)');
+
+  const layout = {
+    title: 'Mangaku',
+    description: '3',
+  };
+
+  return(
+    <Layout layout={layout}>
+      {isMobile ? undefined:<DetailDesktop/>}
+    </Layout>
+  )
+}
+
+function DetailDesktop() {
     const [manga, setManga] = useState({});
     const [user, setUser] = useState({});
     const [page, setPage] = useState(2);
     const [loading, setLoading] = useState(true);
+    const [more, setMore] = useState(false);
     const [cookies] = useCookies(['token']);
     const router = useRouter();
     const { slug } = router.query;
@@ -390,9 +447,13 @@ export default function Detail() {
     const toggleSortOrder = () => {
       setSortBy((prevSortBy) => (prevSortBy === 'likeCount' ? 'created' : 'likeCount'));
       setInitialSort(!initialSort);
-  };
+    };
 
-    const layout = {
+    const toggleMore = () => {
+      setMore(!more)
+    };
+
+   const layout = {
         title: loading ? 'Mangaku' : `${manga.title} en Español | Mangaku`,
         description: '3',
     };
@@ -410,11 +471,11 @@ export default function Detail() {
                 :
                 <>
                 <ContainerMobile>
-                  <BackgroundMobile>
-                    <picture>
-                      <img src={manga?.poster} alt={manga?.title}/>
-                    </picture>
-                  </BackgroundMobile>
+                    <BackgroundMobile>
+                      <picture>
+                        <img src={manga?.poster} alt={manga?.title}/>
+                      </picture>
+                    </BackgroundMobile>
                   <PictureMobile>
                     <picture>
                       <img src={manga?.poster} alt={manga?.title}/>
@@ -427,22 +488,22 @@ export default function Detail() {
                   <BtnsContent>
                       <Btns onClick={() => addLike(manga._id)}>
                         {manga.likes && manga.likes.includes(user._id) ? (
-                            <Liked width={24} height={24} />
+                            <Liked width={19} height={19} />
                               ) : (
-                            <Like width={22} height={22} />
+                            <Like width={18} height={18} />
                         )}
                         <p>{manga?.likeCount}</p>
                       </Btns>
                       <Btns onClick={() => adddisLike(manga._id)}>
                         {manga.dislikes && manga.dislikes.includes(user._id) ? (
-                           <Disliked style={{marginTop: '2px'}} width={23} height={23}/>
+                           <Disliked style={{marginTop: '1px'}} width={19} height={19}/>
                         ) :  (
-                           <Dislike style={{marginTop: '3px'}} width={22} height={22}/>
+                           <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
                         )}
                         <p>{manga?.disLikeCount}</p>
                       </Btns>
                       <Btns>
-                        <View width={22} height={22}/>
+                        <View width={18} height={18}/>
                         <p>{manga?.views}</p>
                       </Btns>
                     </BtnsContent>
@@ -450,18 +511,18 @@ export default function Detail() {
                     <BtnsContent>
                      <Link href="/login">
                       <Btns>
-                        <Like width={22} height={22} />
+                        <Like width={18} height={18} />
                         <p>{manga?.likeCount}</p>
                       </Btns>
                     </Link>
                     <Link href="/login">
                       <Btns>
-                        <Dislike style={{marginTop: '5px'}} width={22} height={22}/>
+                        <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
                         <p>{manga?.disLikeCount}</p>
                       </Btns>
                     </Link>
                     <Btns>
-                      <View width={22} height={22}/>
+                      <View width={18} height={18}/>
                       <p>{manga?.views}</p>
                     </Btns>
                   </BtnsContent>
@@ -471,7 +532,32 @@ export default function Detail() {
                       <Genres key={index}>{genre}</Genres>
                     ))}
                   </GenresContent>
-                  <OverViewMobile>{manga.overview}</OverViewMobile>
+                  <OverViewMobile more={more}>{manga.overview}</OverViewMobile>
+                  {more && <Border/>}
+                  {more &&
+                  <>
+                  <Infox>
+                    <p>Autor</p>
+                    <p>{manga?.author}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Artista</p>
+                    <p>{manga?.author}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Titulo Alternativo</p>
+                    <p>{manga?.titleJp}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Publicación</p>
+                    <p>2022</p>
+                  </Infox>
+                  </>
+                  }
+                  {more ? <MoreBtn onClick={toggleMore}>MENOS DETALLES</MoreBtn>:<MoreBtn onClick={toggleMore}>MÁS DETALLES</MoreBtn>}
                 </Info>
                 </>
             }
