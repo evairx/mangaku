@@ -56,7 +56,7 @@ function MyApp({ Component, pageProps }) {
   }, [cookies.token, setCookie, tokenGuardado]);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return null;
   }
 
   const handleContextMenu = (event) => {

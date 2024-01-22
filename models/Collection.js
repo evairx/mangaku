@@ -11,7 +11,7 @@ const CollectionSchema = new Schema({
     type: String,
     required: true,
   },
-  titleJp: {
+  titleAlt: {
     type: String,
     required: false,
   },
@@ -28,6 +28,14 @@ const CollectionSchema = new Schema({
   },
   author: {
     type: String,
+    required: true,
+  },
+  artist: {
+    type: String,
+    required: true,
+  },
+  publication: {
+    type: Number,
     required: true,
   },
   genres: [

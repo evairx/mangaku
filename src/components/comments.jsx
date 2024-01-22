@@ -7,6 +7,7 @@ import FilterIcon from "@/src/icon/filterComment";
 import MoreIco from "@/src/icon/More"
 import Liked from "@/src/icon/Liked";
 import Like from "@/src/icon/Like";
+import Reply from "@/src/icon/Reply"
 import styled from "@emotion/styled"
 import useClick from "@/src/hooks/useClick";
 
@@ -101,7 +102,7 @@ const Date = styled.p`
 
 const Sub = styled.div`
     display: flex;
-    gap: 1.200rem;
+    gap: .700rem;
     margin-top: 1.400rem;
 `
 
@@ -121,7 +122,7 @@ const ContainerComments = styled.div`
     
 
     @media screen and (max-width: 653px) {
-        padding: 1rem;
+        padding: 0.800rem 0.8rem;
         display: block;
         width: 100%;
     }
@@ -162,20 +163,20 @@ const CommentArea = styled.div`
     border-style: dashed;
 
     h3 {
-        margin-bottom: .400rem;
+    margin-bottom: .400rem;
     }
 
     @media screen and (max-width: 1400px) {
         width: 600px;
-        }
+    }
     
-       @media screen and (max-width: 850px) {
+    @media screen and (max-width: 850px) {
         width: 500px;
-       }
+    }
     
-       @media screen and (max-width: 653px) {
-        width: 100%;
-       }
+    @media screen and (max-width: 653px) {
+    width: 100%;
+    }
 `
 
 const CommentButtons = styled.div`
@@ -473,7 +474,12 @@ const Div = styled.main`
   height:20lvh;
 `
 
-
+const ReplyContent = styled.main`
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    gap:.400rem;
+`
 
 export default function Comments({ id }) {
     const [user, setUser] = useState({});
@@ -903,7 +909,7 @@ export default function Comments({ id }) {
                             <p>{comment.content}</p>
                             {comment.delete ? null : <Sub>
                             {user._id ? 
-                                <Content onClick={() => addLike(comment._id)}>
+                                <Content style={{marginRight: '.800rem'}} onClick={() => addLike(comment._id)}>
                                     {comment.likes && comment.likes.includes(user._id) ? (
                                         <Liked style={{marginBottom:'2px'}} width={22} height={22} />
                                     ) : (
@@ -913,12 +919,18 @@ export default function Comments({ id }) {
                                 </Content>
                                 :
                                 <Link href="/login">
-                                    <Content>
+                                    <Content style={{marginRight: '.800rem'}}>
                                         <Like width={18} height={18} />
                                         <p>{comment.likeCount}</p>
                                     </Content>
                                 </Link>
                             }
+                                {user._id &&
+                                <ReplyContent>
+                                    <Reply width={19} height={19}/>
+                                    <p>RESPONDER</p>
+                                </ReplyContent>
+                                }
                                 <ContentS openMore={comment._id === openMore} onClick={() => handleMore(comment._id)}>
                                     {comment._id === openMore && <MoreContent ref={moreRef}>
                                         <MoreBtns>Reportar</MoreBtns>

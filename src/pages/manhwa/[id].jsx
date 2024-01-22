@@ -1,7 +1,5 @@
 import styled from "@emotion/styled"
 import Layout from "@/layout/View"
-import { useRouter } from 'next/router';
-import { useEffect, useState } from "react";
 
 const Container = styled.div`
     margin: 0 auto;
@@ -9,11 +7,8 @@ const Container = styled.div`
 `
 
 const Figure = styled.figure`
-    padding: 0;
-
     img {
       object-fit: cover; 
-      object-position: center top;
 
       @media screen and (max-width: 938px) {
         width: 70%;
@@ -28,49 +23,15 @@ const Figure = styled.figure`
 `
 
 export default function Manga() {
-    const [detectedImages, setDetectedImages] = useState([]);
-    const router = useRouter();
-    const { page } = router.query;
-
-    useEffect(() => {
-        const imageElement = document.getElementById(`image-${page}`);
-        if (imageElement) {
-            imageElement.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [page]);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const imageElements = document.querySelectorAll('[id^="image-"]');
-
-            imageElements.forEach((imageElement) => {
-                const imageId = imageElement.id.replace('image-', '');
-                const isImageDetected = detectedImages.includes(imageId);
-                const scrollPosition = window.scrollY;
-                const imagePosition = imageElement.offsetTop;
-
-                if (scrollPosition >= imagePosition && scrollPosition < imagePosition + imageElement.offsetHeight && !isImageDetected) {
-                    console.log(`You are currently viewing Image ${imageId}!`);
-                    setDetectedImages((prevDetectedImages) => [...prevDetectedImages, imageId]);
-                }
-            });
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [detectedImages]);
 
     return (
         <Layout>
             <Container>
                 {[...Array(13).keys()].map((index) => (
-                    <div key={`image-${index + 1}`} id={`image-${index + 1}`}>
+                    <div key={`image-${index + 1}`} style={{ margin: '-4px 0' }}>
                       <Figure>
                         <picture>
-                          <img src={`/${index + 1}.webp`} loading="lazy" />
+                          <img id={`image-${index + 1}`} src={`/${index + 1}.webp`} loading="lazy" />
                         </picture>
                       </Figure>
                     </div>

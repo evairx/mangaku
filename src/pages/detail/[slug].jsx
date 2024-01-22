@@ -204,262 +204,311 @@ const Bar = styled.span`
 
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
+  const [manga, setManga] = useState({});
+  const [user, setUser] = useState({});
+  const [rating, setRating] = useState({});
+  const [page, setPage] = useState(2);
+  const [loading, setLoading] = useState(true);
+  const [more, setMore] = useState(false);
+  const [cookies] = useCookies(['token']);
+  const router = useRouter();
+  const { slug } = router.query;
+
+  if (rating.up) {
+    console.log(rating)
+  }
+
+  useEffect(() => {
+    const fetchUser = async () => {
+        const token = cookies.token;
+  
+        try {
+          const decoded = jwt.decode(token);
+      
+          if (decoded.status === "OFFLINE") {
+            setLoading(false);
+            return;
+          }
+      
+          const fetchUserAccount = async () => {
+            try {
+              const response = await fetch('/api/v1/user/account', {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+      
+              if (!response.ok) {
+                throw new Error(response.statusText);
+              }
+      
+              const data = await response.json();
+              setUser(data);
+            } catch (error) {
+              console.error(error);
+              removeCookieFromSecond('token');
+            } finally {
+              setLoading(false);
+            }
+          };
+      
+          fetchUserAccount();
+        } catch (decodeError) {
+          console.error("Error decoding token:", decodeError);
+          setLoading(true); 
+        }
+    }
+    fetchUser();
+  }, [cookies.token]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const token = cookies.token;
+
+            if (slug === undefined) {
+              console.log('error')
+            }
+            
+            await fetch(`/api/v1/manga/${slug}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }).then(response => {
+                if (!response.ok) {
+                  throw new Error(response.statusText);
+                }
+                return response.json();
+              })
+              .then(data => {
+                setManga(data);
+                setLoading(false);
+              })
+              .catch(error => {
+                console.error(error);
+                setLoading(true);
+              });
+        } catch (error) {
+            console.error(error);
+            setLoading(true);
+        }
+    };
+
+    const fetchRating = async () => {
+      try {
+          const token = cookies.token;
+
+          await fetch(`/api/v1/reviews/detail/rating/${slug}`, {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          }).then(response => {
+              if (!response.ok) {
+                throw new Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              setRating(data);
+              setLoading(false);
+            })
+            .catch(error => {
+              console.error(error);
+              setLoading(true);
+            });
+      } catch (error) {
+          console.error(error);
+          setLoading(true);
+      }
+  };
+  if (slug) {
+    fetchRating()
+    fetchData();
+  }
+
+  }, [slug]);
+
+  function handleChapters(){
+      setPage(1);
+  }
+
+  function handleComents(){
+      setPage(2);
+  }
+
+  function addLike(mangaId) {
+    const updatedRating = { ...rating };
+
+    if (updatedRating.rating === "") {
+      updatedRating.up.total += 1;
+      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
+      updatedRating.rating = "up";
+    } else if (updatedRating.rating === "up") {
+      updatedRating.up.total -= 1;
+      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
+      updatedRating.rating = "";
+    } else if (updatedRating.rating === "down") {
+      updatedRating.down.total -= 1;
+      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
+      updatedRating.up.total += 1;
+      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
+      updatedRating.rating = "up";
+    }
+    
+    setRating(updatedRating);
+    
+    function formatLikesCount(likes) {
+      if (likes >= 1000 && likes < 1000000) {
+        return formatNumberWithK(likes, 1000);
+      } else if (likes >= 1000000 && likes < 1000000000) {
+        return formatNumberWithK(likes, 1000000);
+      } else if (likes >= 1000000000) {
+        return formatNumberWithK(likes, 1000000000);
+      } else {
+        return likes.toString();
+      }
+    }
+    
+    function formatNumberWithK(value, divisor) {
+      const result = Math.floor(value / divisor);
+      const remainder = value % divisor;
+      const decimal = Math.floor(remainder / (divisor / 10));
+    
+      if (decimal >= 5) {
+        return (result + 1).toString() + '.' + (decimal - 5).toString() + ' K';
+      } else {
+        return result.toString() + '.' + decimal.toString() + ' K';
+      }
+    }
+
+    const responseLike = {
+        collectionId: mangaId,
+        userId: user._id,
+    };
+
+    const token = cookies.token;
+
+    fetch('/api/v1/reviews/detail/votes?action=up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(responseLike),
+    })
+    .then(response => response.json())
+    .then(data => {
+    })
+    .catch(error => {
+        console.error('Error al enviar comentario:', error);
+    });
+  }
+
+  function adddisLike(mangaId) {
+    const updatedRating = { ...rating };
+
+    if (updatedRating.rating === "") {
+      updatedRating.down.total += 1;
+      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
+      updatedRating.rating = "down";
+    } else if (updatedRating.rating === "down") {
+      updatedRating.down.total -= 1;
+      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
+      updatedRating.rating = "";
+    } else if (updatedRating.rating === "up") {
+      updatedRating.up.total -= 1;
+      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
+      updatedRating.down.total += 1;
+      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
+      updatedRating.rating = "down";
+    }
+    
+    setRating(updatedRating);
+    
+    function formatLikesCount(likes) {
+      if (likes >= 1000 && likes < 1000000) {
+        return formatNumberWithK(likes, 1000);
+      } else if (likes >= 1000000 && likes < 1000000000) {
+        return formatNumberWithK(likes, 1000000);
+      } else if (likes >= 1000000000) {
+        return formatNumberWithK(likes, 1000000000);
+      } else {
+        return likes.toString();
+      }
+    }
+    
+    function formatNumberWithK(value, divisor) {
+      const result = Math.floor(value / divisor);
+      const remainder = value % divisor;
+      const decimal = Math.floor(remainder / (divisor / 10));
+    
+      if (decimal >= 5) {
+        return (result + 1).toString() + '.' + (decimal - 5).toString() + ' K';
+      } else {
+        return result.toString() + '.' + decimal.toString() + ' K';
+      }
+    }
+
+    const responseLike = {
+        collectionId: mangaId,
+        userId: user._id,
+    };
+
+    const token = cookies.token;
+
+    fetch('/api/v1/reviews/detail/votes?action=down', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(responseLike),
+    })
+    .then(response => response.json())
+    .then(data => {
+    })
+    .catch(error => {
+        console.error('Error al enviar comentario:', error);
+    });
+  }
+
+  const toggleSortOrder = () => {
+    setSortBy((prevSortBy) => (prevSortBy === 'likeCount' ? 'created' : 'likeCount'));
+    setInitialSort(!initialSort);
+  };
+
+  const toggleMore = () => {
+    setMore(!more)
+  };
 
   const layout = {
-    title: 'Mangaku',
+    title: loading ? 'Mangaku' : `${manga.title} en Español | Mangaku`,
     description: '3',
   };
 
   return(
     <Layout layout={layout}>
-      {isMobile ? undefined:<DetailDesktop/>}
+      {isMobile ?
+        undefined
+        :
+        <DetailMobile
+          loading={loading} 
+          manga={manga} 
+          user={user} 
+          more={more} 
+          toggleMore={toggleMore} 
+          page={page}
+          addLike={addLike}
+          adddisLike={adddisLike}
+          rating={rating}
+        />}
     </Layout>
   )
 }
 
-function DetailDesktop() {
-    const [manga, setManga] = useState({});
-    const [user, setUser] = useState({});
-    const [page, setPage] = useState(2);
-    const [loading, setLoading] = useState(true);
-    const [more, setMore] = useState(false);
-    const [cookies] = useCookies(['token']);
-    const router = useRouter();
-    const { slug } = router.query;
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = cookies.token;
-                
-                await fetch(`/api/v1/manga/${slug}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }).then(response => {
-                    if (!response.ok) {
-                      throw new Error(response.statusText);
-                    }
-                    return response.json();
-                  })
-                  .then(data => {
-                    setManga(data);
-                    setLoading(false);
-                  })
-                  .catch(error => {
-                    console.error(error);
-                    setLoading(true);
-                  });
-            } catch (error) {
-                console.error(error);
-                setLoading(true);
-            }
-        };
-
-        fetchData();
-
-    }, [slug]);
-
-    useEffect(() => {
-      const fetchUser = async () => {
-          const token = cookies.token;
-    
-          try {
-            const decoded = jwt.decode(token);
-        
-            if (decoded.status === "OFFLINE") {
-              setLoading(false);
-              return;
-            }
-        
-            const fetchUserAccount = async () => {
-              try {
-                const response = await fetch('/api/v1/user/account', {
-                  headers: {
-                    'Authorization': `Bearer ${token}`
-                  }
-                });
-        
-                if (!response.ok) {
-                  throw new Error(response.statusText);
-                }
-        
-                const data = await response.json();
-                setUser(data);
-              } catch (error) {
-                console.error(error);
-                removeCookieFromSecond('token');
-              } finally {
-                setLoading(false);
-              }
-            };
-        
-            fetchUserAccount();
-          } catch (decodeError) {
-            console.error("Error decoding token:", decodeError);
-            setLoading(true); 
-          }
-      }
-      fetchUser();
-  }, [cookies.token]);
-
-    function handleChapters(){
-        setPage(1);
-    }
-
-    function handleComents(){
-        setPage(2);
-    }
-
-    function addLike(mangaId) {
-      const updatedManga = { ...manga }; // Crear una copia del objeto manga
-
-      if (updatedManga._id === mangaId) {
-        const likeIndex = updatedManga.likes.indexOf(user._id);
-        const dislikeIndex = updatedManga.dislikes.indexOf(user._id);
-      
-        if (dislikeIndex !== -1) {
-          updatedManga.dislikes.splice(dislikeIndex, 1);
-          updatedManga.likes.push(user._id);
-        } else if (likeIndex !== -1) {
-          updatedManga.likes.splice(likeIndex, 1);
-        } else {
-          updatedManga.likes.push(user._id);
-        }
-      
-        updatedManga.likeCount = updatedManga.likes.length;
-        updatedManga.disLikeCount = updatedManga.dislikes.length; // Actualizar dislikeCount
-      
-        // Formatear likeCount con K si es mayor o igual a 1000
-        updatedManga.likeCount = formatLikeCount(updatedManga.likeCount);
-      }
-      
-      setManga(updatedManga);
-
-      
-      // Función para formatear el likeCount con K si es mayor o igual a 1000
-      function formatLikeCount(count) {
-        if (count >= 1000) {
-          return formatNumberWithK(count, 1000);
-        }
-        return count.toString();
-      }
-      
-      function formatNumberWithK(number, divisor) {
-        if (number % divisor === 0) {
-          return `${Math.floor(number / divisor)} K`;
-        } else if ((number % divisor) % 100 === 0) {
-          return `${(number / divisor).toFixed(1)} K`;
-        } else {
-          return `${(number / divisor).toFixed(1).replace(/\.0$/, '')} K`;
-        }
-      }
-      
-      const responseLike = {
-          collectionId: mangaId,
-          userId: user._id,
-      };
-
-      const token = cookies.token;
-
-      fetch('/api/v1/reviews/detail/votes?action=404e03cf-9576-41b9-9818-8067bc79b94f', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(responseLike),
-      })
-      .then(response => response.json())
-      .then(data => {
-      })
-      .catch(error => {
-          console.error('Error al enviar comentario:', error);
-      });
-    }
-
-    function adddisLike(mangaId) {
-      const updatedManga = { ...manga }; // Crear una copia del objeto manga
-
-      if (updatedManga._id === mangaId) {
-        const likeIndex = updatedManga.likes.indexOf(user._id);
-        const dislikeIndex = updatedManga.dislikes.indexOf(user._id);
-    
-        if (likeIndex !== -1) {
-          updatedManga.likes.splice(likeIndex, 1);
-          updatedManga.dislikes.push(user._id);
-        } else if (dislikeIndex !== -1) {
-          updatedManga.dislikes.splice(dislikeIndex, 1);
-        } else {
-          updatedManga.dislikes.push(user._id);
-        }
-    
-        updatedManga.disLikeCount = updatedManga.dislikes.length;
-        updatedManga.likeCount = updatedManga.likes.length;
-    
-        // Formatear disLikeCount con K si es mayor o igual a 1000
-        updatedManga.disLikeCount = formatLikeCount(updatedManga.disLikeCount);
-      }
-    
-      setManga(updatedManga);
-       
-      // Función para formatear el likeCount con K si es mayor o igual a 1000
-      function formatLikeCount(count) {
-        if (count >= 1000) {
-          return formatNumberWithK(count, 1000);
-        }
-        return count.toString();
-      }
-      
-      function formatNumberWithK(number, divisor) {
-        if (number % divisor === 0) {
-          return `${Math.floor(number / divisor)} K`;
-        } else if ((number % divisor) % 100 === 0) {
-          return `${(number / divisor).toFixed(1)} K`;
-        } else {
-          return `${(number / divisor).toFixed(1).replace(/\.0$/, '')} K`;
-        }
-      }
-      
-      const responseLike = {
-          collectionId: mangaId,
-          userId: user._id,
-      };
-
-      const token = cookies.token;
-
-      fetch('/api/v1/reviews/detail/votes?action=85a488aa-b5c4-44e8-9d97-e69147e3c142', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(responseLike),
-      })
-      .then(response => response.json())
-      .then(data => {
-      })
-      .catch(error => {
-          console.error('Error al enviar comentario:', error);
-      });
-    }
-
-    const toggleSortOrder = () => {
-      setSortBy((prevSortBy) => (prevSortBy === 'likeCount' ? 'created' : 'likeCount'));
-      setInitialSort(!initialSort);
-    };
-
-    const toggleMore = () => {
-      setMore(!more)
-    };
-
-   const layout = {
-        title: loading ? 'Mangaku' : `${manga.title} en Español | Mangaku`,
-        description: '3',
-    };
-
+function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, adddisLike, rating}) {
     return (
-        <Layout layout={layout}>
+        <>
             {loading ?
                 <ContentLoad>
                     <Loader>
@@ -487,20 +536,20 @@ function DetailDesktop() {
                   {user._id ? 
                   <BtnsContent>
                       <Btns onClick={() => addLike(manga._id)}>
-                        {manga.likes && manga.likes.includes(user._id) ? (
+                        {rating.up && rating.rating === "up" ? (
                             <Liked width={19} height={19} />
                               ) : (
                             <Like width={18} height={18} />
                         )}
-                        <p>{manga?.likeCount}</p>
+                         <p>{rating.up && rating?.up.displayed}</p>
                       </Btns>
                       <Btns onClick={() => adddisLike(manga._id)}>
-                        {manga.dislikes && manga.dislikes.includes(user._id) ? (
+                        {rating.down && rating.rating === "down" ? (
                            <Disliked style={{marginTop: '1px'}} width={19} height={19}/>
                         ) :  (
                            <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
                         )}
-                        <p>{manga?.disLikeCount}</p>
+                        <p>{rating.down && rating?.down.displayed}</p>
                       </Btns>
                       <Btns>
                         <View width={18} height={18}/>
@@ -512,13 +561,13 @@ function DetailDesktop() {
                      <Link href="/login">
                       <Btns>
                         <Like width={18} height={18} />
-                        <p>{manga?.likeCount}</p>
+                        <p>{rating.up && rating?.up.displayed}</p>
                       </Btns>
                     </Link>
                     <Link href="/login">
                       <Btns>
                         <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
-                        <p>{manga?.disLikeCount}</p>
+                        <p>{rating.down && rating?.down.displayed}</p>
                       </Btns>
                     </Link>
                     <Btns>
@@ -543,17 +592,17 @@ function DetailDesktop() {
                   <Border/>
                   <Infox>
                     <p>Artista</p>
-                    <p>{manga?.author}</p>
+                    <p>{manga?.artist}</p>
                   </Infox>
                   <Border/>
                   <Infox>
                     <p>Titulo Alternativo</p>
-                    <p>{manga?.titleJp}</p>
+                    <p>{manga?.titleAlt}</p>
                   </Infox>
                   <Border/>
                   <Infox>
                     <p>Publicación</p>
-                    <p>2022</p>
+                    <p>{manga?.publication}</p>
                   </Infox>
                   </>
                   }
@@ -571,6 +620,6 @@ function DetailDesktop() {
                     <Comments id={manga._id} />
                 }
             </div>}
-        </Layout>
+        </>
     );
 }

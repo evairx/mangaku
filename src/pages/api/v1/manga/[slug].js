@@ -97,38 +97,6 @@ export default async function handler(req, res) {
             manga.background = null;
         }
 
-        const likes = manga.likes;
-
-        const dislikes = manga.dislikes;
-
-        const likee = likes ? likes.length : 0;
-        
-        const dislikee = dislikes ? dislikes.length : 0;
-
-        function formatLikesCount(likee) {
-            if (likee >= 1000 && likee < 1000000) {
-              return formatNumberWithK(likee, 1000);
-            } else if (likee >= 1000000 && likee < 1000000000) {
-              return formatNumberWithK(likee, 1000000);
-            } else if (likee >= 1000000000) {
-              return formatNumberWithK(likee, 1000000000);
-            } else {
-              return likee.toString();
-            }
-          }
-
-        function formatdisLikesCount(dislikee) {
-            if (dislikee >= 1000 && dislikee < 1000000) {
-              return formatNumberWithK(dislikee, 1000);
-            } else if (dislikee >= 1000000 && dislikee < 1000000000) {
-              return formatNumberWithK(dislikee, 1000000);
-            } else if (dislikee >= 1000000000) {
-              return formatNumberWithK(dislikee, 1000000000);
-            } else {
-              return dislikee.toString();
-            }
-          }
-
           const views = Math.floor(manga.views);
 
           function formatViews(views) {
@@ -163,27 +131,22 @@ export default async function handler(req, res) {
             }
           }
 
-        const likeCount = formatLikesCount(likee);
-        const disLikeCount = formatdisLikesCount(dislikee);
-
         const viewsCount = formatViews(views);
 
         return {
           _id: manga._id,
           title: manga.title,
-          titleJp: manga.titleJp,
+          titleAlt: manga.titleAlt,
           author: manga.author,
+          artist: manga.artist,
           poster: manga.poster,
           background: manga.background,
           overview: manga.overview,
           format: manga.format,
-          likes: manga.likes,
-          likeCount: likeCount,
-          disLikeCount: disLikeCount,
-          dislikes: manga.dislikes,
           views: viewsCount,
           genres: manga.genres,
           status: manga.status,
+          publication: manga.publication,
           date: manga.date
         };
       };

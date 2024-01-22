@@ -33,8 +33,8 @@ export default async function handler(req, res) {
                 return res.status(404).json({ error: 'La colección no pudo ser encontrada' });
             }
 
-            const addLike = "404e03cf-9576-41b9-9818-8067bc79b94f"
-            const addDisLike = "85a488aa-b5c4-44e8-9d97-e69147e3c142"
+            const addLike = "up"
+            const addDisLike = "down"
 
             if (action === addLike) {
                 // Verificar si el usuario dio dislike

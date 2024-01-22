@@ -29,6 +29,31 @@ const commentSchema = new Schema({
             required: false,
         }
     ],
+    reply: [{
+        _id : {
+            type: String,
+            default: uuidv4,
+        },
+        content: {
+            type: String,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
+        spoilerContent: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
+        likes: [
+            {
+                type: String,
+                required: false,
+            }
+        ],
+    }],
     date: {
         type: Date,
         default: Date.now,

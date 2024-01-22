@@ -365,7 +365,7 @@ function Carousel() {
               </Logo></Link>
                 {isWidth && <Text>{manga.overview}</Text>}
               <div>
-              <Link href={`/${manga.format.toLowerCase()}/${manga._id}?page=1`}><Button>Empezar a leer</Button></Link>
+              <Link href={`/${manga.format.toLowerCase()}/${manga._id}`}><Button>Empezar a leer</Button></Link>
               </div>
             </Info>
             <Figure>
