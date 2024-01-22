@@ -87,8 +87,10 @@ const AddManga = ({ genres, format, status, url, token }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
-    titleJp: '',
+    titleAlt: '',
     author: '',
+    artist: '',
+    publication: '',
     overview: '',
     format: '',
     genres: [],
@@ -275,9 +277,9 @@ const AddManga = ({ genres, format, status, url, token }) => {
           />
           <input
             type="text"
-            name="titleJp"
-            placeholder="Titulo Japones"
-            value={formData.titleJp}
+            name="titleAlt"
+            placeholder="title Alternativo"
+            value={formData.titleAlt}
             onChange={handleInputChange}
           />
           <input
@@ -285,6 +287,20 @@ const AddManga = ({ genres, format, status, url, token }) => {
             name="author"
             placeholder="Autor"
             value={formData.author}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="artist"
+            placeholder="Artista"
+            value={formData.artist}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="publication"
+            placeholder="Año"
+            value={formData.publication}
             onChange={handleInputChange}
           />
           <input

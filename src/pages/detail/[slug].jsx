@@ -214,10 +214,6 @@ export default function Detail() {
   const router = useRouter();
   const { slug } = router.query;
 
-  if (rating.up) {
-    console.log(rating)
-  }
-
   useEffect(() => {
     const fetchUser = async () => {
         const token = cookies.token;
@@ -384,12 +380,13 @@ export default function Detail() {
     const responseLike = {
         collectionId: mangaId,
         userId: user._id,
+        type: "up"
     };
 
     const token = cookies.token;
 
-    fetch('/api/v1/reviews/detail/votes?action=up', {
-        method: 'POST',
+    fetch(`/api/v1/reviews/detail/rating/${slug}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -452,12 +449,13 @@ export default function Detail() {
     const responseLike = {
         collectionId: mangaId,
         userId: user._id,
+        type: "down"
     };
 
     const token = cookies.token;
 
-    fetch('/api/v1/reviews/detail/votes?action=down', {
-        method: 'POST',
+    fetch(`/api/v1/reviews/detail/rating/${slug}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
