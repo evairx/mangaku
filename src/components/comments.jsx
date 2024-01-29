@@ -724,7 +724,7 @@ export default function Comments({ id }) {
 
         const token = cookies.token;
   
-        fetch('/api/v1/reviews/comment/votes', {
+        fetch('/api/v1/reviews/comment/rating/votes', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
