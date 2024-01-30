@@ -10,6 +10,8 @@ import jwt from "jsonwebtoken"
 import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
 import styled from '@emotion/styled';
+import useClick from "@/src/hooks/useClick";
+
 
 const ContainerMobile = styled.div`
   display:flex;
@@ -82,6 +84,26 @@ const PictureMobile = styled.figure`
   }
 `
 
+const PictureLoading = styled.div`
+  opacity: 0.7;
+  margin-top:2rem;
+  animation: skeleton-loading .5s linear infinite alternate;
+  width: 230px;
+  height:311px;
+  background-color: var(--skeleton-color);
+  margin-bottom:20px;
+
+  @keyframes skeleton-loading {
+    0% {
+      background-color: var(--skeleton-color);
+    }
+
+    100% {
+      background-color: var(--skeleton-color-100);
+    }
+  }
+`
+
 const Info = styled.div`
   padding:0 .800rem;
   width:100%;
@@ -93,6 +115,15 @@ const TitleMobile = styled.p`
   font-weight:600;
   word-wrap: break-word;
   max-height: none;
+`
+
+const TitleLoading = styled.div`
+  opacity: 0.7;
+  animation: skeleton-loading .5s linear infinite alternate;
+  width: 120px;
+  height:35px;
+  background-color: var(--skeleton-color);
+  margin-bottom:1rem;
 `
 
 const GenresContent = styled.div`
@@ -199,6 +230,49 @@ const Bar = styled.span`
     }
   }
 `;
+
+const ValidationBox = styled.section`
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-nav);
+    height:330px;
+    padding: 1rem;
+    z-index: 999;
+    width: 400px;
+    text-align: center;
+    z-index: 1001;
+    -webkit-box-shadow: 0px 0px 15px 0px #000000; 
+    box-shadow: 0px 0px 15px 0px #000000;
+
+    @media screen and (max-width: 653px) {
+      height:330px;
+    }
+
+    @media screen and (max-width: 420px) {
+      width:95%;
+    }
+
+
+`
+
+export const OverLayy = styled.section`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    pointer-events: auto;
+    overflow-y: hidden;
+    background: #0000004d;
+    opacity: ${props => (props.openVali ? 1 : 0)};
+    visibility: ${props => (props.openVali ? 'visible' : 'hidden')}; 
+    transition: opacity 0.3s ease-out;
+    z-index: 1000;
+`;
+
 
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
@@ -339,8 +413,6 @@ export default function Detail() {
   
       if (updatedRating.rating === "") {
         updatedRating.rating = `${number}`;
-      } else if (updatedRating.rating === `${number}`) {
-        updatedRating.rating = "";
       } else {
         updatedRating.rating = `${number}`;
       }
@@ -388,7 +460,7 @@ export default function Detail() {
     for (let i = 1; i <= 5; i++) {
       if (i <= Math.floor(parseFloat(ratingValue))) {
         stars.push(<Star onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} style={{color: color}} key={i} />);
-      } else if (i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0 && color === '#ffff') {
+      } else if (i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0) {
         stars.push(<StarHalf width={28} height={28} key={i} />);
       } else {
         stars.push(<StarEmpty onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} key={i} />);
@@ -397,13 +469,13 @@ export default function Detail() {
   };
   
   if (!rating.rating || rating.rating === " ") {
-    renderStars(parseFloat(rating.average), '#ffff');
+    renderStars(parseFloat(rating.average), 'currentColor');
   } else if (["1", "2", "3", "4", "5"].includes(rating.rating)) {
     renderStars(parseFloat(rating.rating), 'var(--main)');
   }
 
   const layout = {
-    title: loading ? 'Mangaku' : `${manga.title} en Español | Mangaku`,
+    title: loading ? 'Mangaku' : `${manga.title} | Mangaku`,
     description: '3',
   };
 
@@ -427,7 +499,13 @@ export default function Detail() {
   )
 }
 
-function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, stars, rating}) {
+function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rating}) {
+     const [valiRef, openVali, setOpenVali] = useClick(null);
+
+    function handleVali() {
+      setOpenVali(!openVali)
+    }
+
     return (
         <>
             {loading ?
@@ -441,31 +519,31 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, st
                 :
                 <>
                 <ContainerMobile>
-                    <BackgroundMobile>
+                    {manga.poster && <BackgroundMobile>
                       <picture>
                         <img src={manga?.poster} alt={manga?.title}/>
                       </picture>
-                    </BackgroundMobile>
-                  <PictureMobile>
-                    <picture>
-                      <img src={manga?.poster} alt={manga?.title}/>
-                    </picture>
-                  </PictureMobile>
+                    </BackgroundMobile>}
+                    {manga.poster ?
+                    <PictureMobile>
+                      <picture>
+                        <img src={manga?.poster} alt={manga?.title}/>
+                      </picture>
+                    </PictureMobile>
+                    :
+                    <PictureLoading/>}
                 </ContainerMobile>
                 <Info>
+                  {manga.title ?
                   <TitleMobile>{manga?.title}</TitleMobile>
-                  {user._id ? 
-                    <BtnsContent>
-                      {stars}
-                      <p>{rating.average} ({rating.total})</p>
-                    </BtnsContent>
-                    :
-                    <BtnsContent>
-                     {stars}
-                      <p>{rating.average} ({rating.total})</p>
-                    </BtnsContent>
-                  }
+                  :
+                  <TitleLoading/>}
 
+                  <BtnsContent>
+                      {stars}
+                      <p onClick={handleVali}>{rating.average} ({rating.total})</p>
+                  </BtnsContent>
+          
                   <GenresContent>
                     {manga && manga.genres && manga.genres.map((genre, index) => (
                       <Genres key={index}>{genre}</Genres>
@@ -510,6 +588,58 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, st
                     <Comments id={manga._id} />
                 }
             </div>}
+            
+            {openVali && <ValidationBox ref={valiRef}>
+              {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
+              {rating.rating &&<Border/>}
+              {[5, 4, 3, 2, 1].map((value) => (
+                <div key={value} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem'}}>
+                  <div  style={{display: 'flex', alignItems: 'center', gap: '.400rem'}}>
+                    <Star width={22} height={22}/>
+                    <p>{value}</p>
+                  </div>
+                  {rating && rating[value.toString()] && <BarPuntation percentage={rating[value.toString()].percentage} />}
+                  <p>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+                </div>
+              ))}
+              <Border/>
+              <TextV>puntacion media: {rating.average} de 5</TextV>
+              <TextV>{rating.total.toString()} calificaciónes</TextV>
+            </ValidationBox>}
+
+            <OverLayy openVali={openVali}/>
         </>
     );
 }
+
+const TextVali = styled.p`
+  color:var(--main);
+  font-weight:600;
+  font-size:1.050rem
+`;
+
+const TextV = styled.p`
+  font-weight:500;
+  margin-top:.700rem;
+  margin-bottom:.700rem;
+`;
+
+const BarPuntation = styled.div`
+  width: 200px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: #00000064;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8px;
+    height: 100%; /* Usa el 100% de la altura del contenedor */
+    border-radius: 8px;
+    width: ${props => props.percentage}%;
+    background-color: var(--color);
+  }
+`;
