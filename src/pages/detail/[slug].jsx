@@ -3,12 +3,9 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useQuery from "@/src/hooks/useQuery"
 import { useCookies } from 'react-cookie';
-import RenderStars from '@/src/components/renderStars';
-import Like from "@/src/icon/Like";
-import Liked from "@/src/icon/Liked";
-import Dislike from "@/src/icon/dislike";
-import Disliked from "@/src/icon/disliked";
-import View from "@/src/icon/view";
+import Star from "@/src/icon/star";
+import StarHalf from "@/src/icon/starHalf"
+import StarEmpty from "@/src/icon/starEmpty"
 import jwt from "jsonwebtoken"
 import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
@@ -203,8 +200,6 @@ const Bar = styled.span`
   }
 `;
 
-const average = "3.5";
-
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
   const [manga, setManga] = useState({});
@@ -335,55 +330,28 @@ export default function Detail() {
       setPage(2);
   }
 
-  function addLike(mangaId) {
-    const updatedRating = { ...rating };
+  function addLike(mangaId, i) {
+    
+    const number = i;
 
-    if (updatedRating.rating === "") {
-      updatedRating.up.total += 1;
-      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
-      updatedRating.rating = "up";
-    } else if (updatedRating.rating === "up") {
-      updatedRating.up.total -= 1;
-      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
-      updatedRating.rating = "";
-    } else if (updatedRating.rating === "down") {
-      updatedRating.down.total -= 1;
-      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
-      updatedRating.up.total += 1;
-      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
-      updatedRating.rating = "up";
-    }
-    
-    setRating(updatedRating);
-    
-    function formatLikesCount(likes) {
-      if (likes >= 1000 && likes < 1000000) {
-        return formatNumberWithK(likes, 1000);
-      } else if (likes >= 1000000 && likes < 1000000000) {
-        return formatNumberWithK(likes, 1000000);
-      } else if (likes >= 1000000000) {
-        return formatNumberWithK(likes, 1000000000);
+    setRating((prevRating) => {
+      const updatedRating = { ...prevRating };
+  
+      if (updatedRating.rating === "") {
+        updatedRating.rating = `${number}`;
+      } else if (updatedRating.rating === `${number}`) {
+        updatedRating.rating = "";
       } else {
-        return likes.toString();
+        updatedRating.rating = `${number}`;
       }
-    }
-    
-    function formatNumberWithK(value, divisor) {
-      const result = Math.floor(value / divisor);
-      const remainder = value % divisor;
-      const decimal = Math.floor(remainder / (divisor / 10));
-    
-      if (decimal >= 5) {
-        return (result + 1).toString() + '.' + (decimal - 5).toString() + ' K';
-      } else {
-        return result.toString() + '.' + decimal.toString() + ' K';
-      }
-    }
-
+  
+      return updatedRating;
+    });
+  
     const responseLike = {
         collectionId: mangaId,
         userId: user._id,
-        type: "up"
+        type: `${number}`,
     };
 
     const token = cookies.token;
@@ -404,74 +372,6 @@ export default function Detail() {
     });
   }
 
-  function adddisLike(mangaId) {
-    const updatedRating = { ...rating };
-
-    if (updatedRating.rating === "") {
-      updatedRating.down.total += 1;
-      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
-      updatedRating.rating = "down";
-    } else if (updatedRating.rating === "down") {
-      updatedRating.down.total -= 1;
-      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
-      updatedRating.rating = "";
-    } else if (updatedRating.rating === "up") {
-      updatedRating.up.total -= 1;
-      updatedRating.up.displayed = formatLikesCount(updatedRating.up.total);
-      updatedRating.down.total += 1;
-      updatedRating.down.displayed = formatLikesCount(updatedRating.down.total);
-      updatedRating.rating = "down";
-    }
-    
-    setRating(updatedRating);
-    
-    function formatLikesCount(likes) {
-      if (likes >= 1000 && likes < 1000000) {
-        return formatNumberWithK(likes, 1000);
-      } else if (likes >= 1000000 && likes < 1000000000) {
-        return formatNumberWithK(likes, 1000000);
-      } else if (likes >= 1000000000) {
-        return formatNumberWithK(likes, 1000000000);
-      } else {
-        return likes.toString();
-      }
-    }
-    
-    function formatNumberWithK(value, divisor) {
-      const result = Math.floor(value / divisor);
-      const remainder = value % divisor;
-      const decimal = Math.floor(remainder / (divisor / 10));
-    
-      if (decimal >= 5) {
-        return (result + 1).toString() + '.' + (decimal - 5).toString() + ' K';
-      } else {
-        return result.toString() + '.' + decimal.toString() + ' K';
-      }
-    }
-
-    const responseLike = {
-        collectionId: mangaId,
-        userId: user._id,
-        type: "down"
-    };
-
-    const token = cookies.token;
-
-    fetch(`/api/v1/reviews/detail/rating/${slug}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(responseLike),
-    })
-    .then(response => response.json())
-    .then(data => {
-    })
-    .catch(error => {
-        console.error('Error al enviar comentario:', error);
-    });
-  }
 
   const toggleSortOrder = () => {
     setSortBy((prevSortBy) => (prevSortBy === 'likeCount' ? 'created' : 'likeCount'));
@@ -481,6 +381,26 @@ export default function Detail() {
   const toggleMore = () => {
     setMore(!more)
   };
+
+  const stars = [];
+
+  const renderStars = (ratingValue, color) => {
+    for (let i = 1; i <= 5; i++) {
+      if (i <= Math.floor(parseFloat(ratingValue))) {
+        stars.push(<Star onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} style={{color: color}} key={i} />);
+      } else if (i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0 && color === '#ffff') {
+        stars.push(<StarHalf width={28} height={28} key={i} />);
+      } else {
+        stars.push(<StarEmpty onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} key={i} />);
+      }
+    }
+  };
+  
+  if (!rating.rating || rating.rating === " ") {
+    renderStars(parseFloat(rating.average), '#ffff');
+  } else if (["1", "2", "3", "4", "5"].includes(rating.rating)) {
+    renderStars(parseFloat(rating.rating), 'var(--main)');
+  }
 
   const layout = {
     title: loading ? 'Mangaku' : `${manga.title} en Español | Mangaku`,
@@ -500,14 +420,14 @@ export default function Detail() {
           toggleMore={toggleMore} 
           page={page}
           addLike={addLike}
-          adddisLike={adddisLike}
           rating={rating}
+          stars={stars}
         />}
     </Layout>
   )
 }
 
-function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, adddisLike, rating}) {
+function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, stars, rating}) {
     return (
         <>
             {loading ?
@@ -535,29 +455,15 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, ad
                 <Info>
                   <TitleMobile>{manga?.title}</TitleMobile>
                   {user._id ? 
-                  <BtnsContent>
-                      <RenderStars average={rating.average}/>
+                    <BtnsContent>
+                      {stars}
                       <p>{rating.average} ({rating.total})</p>
                     </BtnsContent>
                     :
                     <BtnsContent>
-                     <Link href="/login">
-                      <Btns>
-                        <Like width={18} height={18} />
-                        <p>{rating.up && rating?.up.displayed}</p>
-                      </Btns>
-                    </Link>
-                    <Link href="/login">
-                      <Btns>
-                        <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
-                        <p>{rating.down && rating?.down.displayed}</p>
-                      </Btns>
-                    </Link>
-                    <Btns>
-                      <View width={18} height={18}/>
-                      <p>{manga?.views}</p>
-                    </Btns>
-                  </BtnsContent>
+                     {stars}
+                      <p>{rating.average} ({rating.total})</p>
+                    </BtnsContent>
                   }
 
                   <GenresContent>
