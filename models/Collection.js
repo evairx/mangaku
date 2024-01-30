@@ -52,18 +52,28 @@ const CollectionSchema = new Schema({
     type: Number,
     default: 0,
   },
-  likes: [
-    {
-        type: String,
-        required: false,
-    }
-  ],
-  dislikes: [
-    {
-        type: String,
-        required: false,
-    }
-  ],
+  votes: {
+    one: [{
+      type: String,
+      required: false,
+    }],
+    two: [{
+      type: String,
+      required: false,
+    }],
+    three: [{
+      type: String,
+      required: false,
+    }],
+    four: [{
+      type: String,
+      required: false,
+    }],
+    five: [{
+      type: String,
+      required: false,
+    }],
+  },
   nsfw: {
     type: Boolean,
   },

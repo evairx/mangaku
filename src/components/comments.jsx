@@ -678,45 +678,53 @@ export default function Comments({ id }) {
       }
 
       function addLike(commentId) {
-        const updatedComments = comments.comments.map(comment => {
-            if (comment._id === commentId) {
-              const userIndex = comment.likes.indexOf(user._id);
-              if (userIndex !== -1) {
-                comment.likes.splice(userIndex, 1);
-              } else {
-                comment.likes.push(user._id);
+        setComments(prevComments => {
+            const updatedComments = prevComments.comments.map(comment => {
+              if (comment._id === commentId) {
+                if (comment.rating === "") {
+                  comment.up.total += 1;
+                  comment.up.displayed = formatLikesCount(comment.up.total);
+                  comment.rating = "up";
+                } else if (comment.rating === "up") {
+                  comment.up.total -= 1;
+                  comment.up.displayed = formatLikesCount(comment.up.total);
+                  comment.rating = "";
+                }
               }
-          
-              comment.likeCount = comment.likes.length;
-          
-              // Formatear likeCount con K si es mayor o igual a 1000
-              comment.likeCount = formatLikeCount(comment.likeCount);
-            }
-            return comment;
+              return comment;
+            });
+        
+            return {
+              ...prevComments,
+              comments: updatedComments,
+            };
           });
           
-          setComments(prevComments => ({
-            ...prevComments,
-            comments: updatedComments,
-          }));
-          
           // Función para formatear el likeCount con K si es mayor o igual a 1000
-          function formatLikeCount(count) {
-            if (count >= 1000) {
-              return formatNumberWithK(count, 1000);
+          function formatLikesCount(likes) {
+            if (likes >= 1000 && likes < 1000000) {
+              return formatNumberWithK(likes, 1000);
+            } else if (likes >= 1000000 && likes < 1000000000) {
+              return formatNumberWithK(likes, 1000000);
+            } else if (likes >= 1000000000) {
+              return formatNumberWithK(likes, 1000000000);
+            } else {
+              return likes.toString();
             }
-            return count.toString();
           }
           
-          function formatNumberWithK(number, divisor) {
-            if (number % divisor === 0) {
-              return `${Math.floor(number / divisor)} K`;
-            } else if ((number % divisor) % 100 === 0) {
-              return `${(number / divisor).toFixed(1)} K`;
+          function formatNumberWithK(value, divisor) {
+            const result = Math.floor(value / divisor);
+            const remainder = value % divisor;
+            const decimal = Math.floor(remainder / (divisor / 10));
+          
+            if (decimal >= 5) {
+              return (result + 1).toString() + '.' + (decimal - 5).toString() + ' K';
             } else {
-              return `${(number / divisor).toFixed(1).replace(/\.0$/, '')} K`;
+              return result.toString() + '.' + decimal.toString() + ' K';
             }
           }
+
         const responseLike = {
             commentId: commentId,
             userId: user._id,
@@ -769,7 +777,6 @@ export default function Comments({ id }) {
         });
     }
 
-    
     function handleAlert() {
         setOpenAlert(!openAlert)
     }
@@ -910,18 +917,18 @@ export default function Comments({ id }) {
                             {comment.delete ? null : <Sub>
                             {user._id ? 
                                 <Content style={{marginRight: '.800rem'}} onClick={() => addLike(comment._id)}>
-                                    {comment.likes && comment.likes.includes(user._id) ? (
+                                   {comment.up && comment.rating === "up" ? (
                                         <Liked style={{marginBottom:'2px'}} width={22} height={22} />
                                     ) : (
                                         <Like style={{marginBottom:'2px'}} width={22} height={22} />
                                     )}
-                                    <p>{comment.likeCount}</p>
+                                    <p>{comment.up && comment?.up.displayed}</p>
                                 </Content>
                                 :
                                 <Link href="/login">
                                     <Content style={{marginRight: '.800rem'}}>
-                                        <Like width={18} height={18} />
-                                        <p>{comment.likeCount}</p>
+                                        <Like style={{marginBottom:'2px'}} width={22} height={22} />
+                                        <p>{comment.up && comment?.up.displayed}</p>
                                     </Content>
                                 </Link>
                             }

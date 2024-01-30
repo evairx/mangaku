@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useQuery from "@/src/hooks/useQuery"
 import { useCookies } from 'react-cookie';
+import RenderStars from '@/src/components/renderStars';
 import Like from "@/src/icon/Like";
 import Liked from "@/src/icon/Liked";
 import Dislike from "@/src/icon/dislike";
@@ -201,6 +202,8 @@ const Bar = styled.span`
     }
   }
 `;
+
+const average = "3.5";
 
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
@@ -484,7 +487,7 @@ export default function Detail() {
     description: '3',
   };
 
-  return(
+  return (
     <Layout layout={layout}>
       {isMobile ?
         undefined
@@ -533,26 +536,8 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, ad
                   <TitleMobile>{manga?.title}</TitleMobile>
                   {user._id ? 
                   <BtnsContent>
-                      <Btns onClick={() => addLike(manga._id)}>
-                        {rating.up && rating.rating === "up" ? (
-                            <Liked width={19} height={19} />
-                              ) : (
-                            <Like width={18} height={18} />
-                        )}
-                         <p>{rating.up && rating?.up.displayed}</p>
-                      </Btns>
-                      <Btns onClick={() => adddisLike(manga._id)}>
-                        {rating.down && rating.rating === "down" ? (
-                           <Disliked style={{marginTop: '1px'}} width={19} height={19}/>
-                        ) :  (
-                           <Dislike style={{marginTop: '2px'}} width={18} height={18}/>
-                        )}
-                        <p>{rating.down && rating?.down.displayed}</p>
-                      </Btns>
-                      <Btns>
-                        <View width={18} height={18}/>
-                        <p>{manga?.views}</p>
-                      </Btns>
+                      <RenderStars average={rating.average}/>
+                      <p>{rating.average} ({rating.total})</p>
                     </BtnsContent>
                     :
                     <BtnsContent>
@@ -574,6 +559,7 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, addLike, ad
                     </Btns>
                   </BtnsContent>
                   }
+
                   <GenresContent>
                     {manga && manga.genres && manga.genres.map((genre, index) => (
                       <Genres key={index}>{genre}</Genres>
