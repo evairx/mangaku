@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { css } from '@emotion/css';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useQuery from "@/src/hooks/useQuery"
@@ -6,6 +7,7 @@ import { useCookies } from 'react-cookie';
 import Star from "@/src/icon/star";
 import StarHalf from "@/src/icon/starHalf"
 import StarEmpty from "@/src/icon/starEmpty"
+import Down from "@/src/icon/down"
 import jwt from "jsonwebtoken"
 import Comments from '@/src/components/comments';
 import Layout from '@/layout/Main';
@@ -136,9 +138,14 @@ const GenresContent = styled.div`
 
 const Genres = styled.span`
   background:var(--genres);
-  font-size:.825rem;
+  font-size:1.150rem;
   padding:.200rem .600rem;
   border-radius: 0 10px 0 10px;
+
+  
+  @media screen and (max-width: 850px) {
+    font-size:.825rem;
+  }
 `
 const OverViewMobile = styled.p`
   width:100%;
@@ -237,7 +244,7 @@ const ValidationBox = styled.section`
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-nav);
-    height:330px;
+    height:360px;
     padding: 1rem;
     z-index: 999;
     width: 400px;
@@ -247,7 +254,7 @@ const ValidationBox = styled.section`
     box-shadow: 0px 0px 15px 0px #000000;
 
     @media screen and (max-width: 653px) {
-      height:330px;
+      height:360px;
     }
 
     @media screen and (max-width: 420px) {
@@ -273,6 +280,17 @@ export const OverLayy = styled.section`
     z-index: 1000;
 `;
 
+const StarsContents = styled.div`
+    display:flex;
+    
+    @media screen and (max-width: 850px) {
+      gap:.400rem;
+    }
+`
+
+const Stars = styled.div`
+    cursor:pointer;
+`
 
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
@@ -454,17 +472,69 @@ export default function Detail() {
     setMore(!more)
   };
 
+  const [hoveredStar, setHoveredStar] = useState(null);
+
   const stars = [];
+
+  const handleStarHover = (index) => {
+    setHoveredStar(index);
+  };
+
 
   const renderStars = (ratingValue, color) => {
     for (let i = 1; i <= 5; i++) {
-      if (i <= Math.floor(parseFloat(ratingValue))) {
-        stars.push(<Star onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} style={{color: color}} key={i} />);
-      } else if (i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0) {
-        stars.push(<StarHalf width={28} height={28} key={i} />);
-      } else {
-        stars.push(<StarEmpty onClick={user && user._id ? () => addLike(manga._id, i) : null} width={28} height={28} key={i} />);
-      }
+      const isHovered = i <= hoveredStar;
+      const isFull = i <= Math.floor(parseFloat(ratingValue));
+      const isHalf = i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0;
+
+      stars.push(
+        <div
+          key={i}
+          className="star-container"
+          onMouseEnter={() => handleStarHover(i)}
+          onMouseLeave={() => setHoveredStar(null)}
+        >
+          <Stars>
+            {isFull ? (
+              <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+            ) : isHalf ? (
+              isHovered ?
+              <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+              :
+              <StarHalf
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+            ) : (
+              isHovered ?
+              <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+              :
+              <StarEmpty
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+            )}
+          </Stars>
+        </div>
+      );
     }
   };
   
@@ -482,7 +552,17 @@ export default function Detail() {
   return (
     <Layout layout={layout}>
       {isMobile ?
-        undefined
+        <DetailDesktop
+          loading={loading} 
+          manga={manga} 
+          user={user} 
+          more={more} 
+          toggleMore={toggleMore} 
+          page={page}
+          addLike={addLike}
+          rating={rating}
+          stars={stars}
+        />
         :
         <DetailMobile
           loading={loading} 
@@ -496,6 +576,203 @@ export default function Detail() {
           stars={stars}
         />}
     </Layout>
+  )
+}
+
+const Container = styled.section`
+  display:flex;
+  padding:2rem 5rem;
+  position:relative;
+  transition: all .3 ease-out;
+  height:60vh;
+  
+  @media screen and (max-width: 1400px) {
+    padding:2rem 4rem;
+  }
+
+  @media screen and (max-width: 1180px) {
+    padding:2rem 2rem;
+  }
+`
+
+const Background = styled.figure`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -10;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  filter:blur(10px);
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(var(--details-gradient), var(--details-gradient-1),var(--details-gradient-2), var(--details-gradient-3), var(--details-gradient-4));
+    z-index: 0; /* Capa del fondo */
+  }
+`;
+
+
+const Picture = styled.figure`
+  width: 360px;
+  height:auto;
+  z-index:1;
+  overflow:hidden;
+  -webkit-box-shadow: 0px 0px 15px -4px #000000; 
+  box-shadow: 0px 0px 15px 0px #000000;
+  border-radius:2px;
+  margin-bottom:20px;
+  
+   
+  img {
+    width:100%;
+    height:100%;
+    object-fit: cover; 
+    object-position: center top;
+  }
+`
+
+const Title = styled.p`
+  font-size:3rem;
+  font-weight:600;
+`
+
+const SubTitle = styled.p`
+  font-size:1.2rem;
+  font-weight:500;
+`
+
+const ContentValues = styled.main`
+  margin-top:.800rem;
+  display:flex;
+  align-items:center;
+  gap:.600rem;
+  font-size:1.2rem;
+`
+
+const OverView = styled.p`
+  width:${props => (props.more ? '100%' : '700px')};
+  font-size: 1.05rem;
+  line-height: 1.55rem;
+  font-weight:400;
+  color:var(--color);
+  display: -webkit-box;
+  -webkit-line-clamp: ${props => (props.more ? 'none' : '3')};
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  ${props => (props.more ? '' : 'white-space: normal;')}
+  ${props => (props.more ? '' : 'text-overflow: ellipsis;')}
+  margin-top:1rem;
+  position:relative;
+
+  @media screen and (max-width: 1350px) {
+    width:${props => (props.more ? '100%' : '600px')};
+  }
+
+  ${props => (props.more ? '' : '&::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(transparent, transparent, var(--details-gradient-4)); z-index: 0; }')}
+`
+
+function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rating}) {
+  const [valiRef, openVali, setOpenVali] = useClick(null);
+
+  function handleVali() {
+    setOpenVali(!openVali)
+  }
+  
+  return (
+    <>
+      {loading ?
+          <ContentLoad>
+            <Loader>
+               <Bar />
+               <Bar />
+                <Bar />
+            </Loader>
+          </ContentLoad>
+          :
+          <>
+            <Container>
+              <Background>
+                <picture>
+                  <img src={manga?.background} alt={manga?.title}/>
+                </picture>
+              </Background>
+              <Picture>
+                <picture>
+                  <img src={manga?.poster} alt={manga?.title}/>
+                </picture>
+              </Picture>
+              <Info>
+                {manga.title ?
+                  <Title>{manga?.title}</Title>
+                  :
+                  <TitleLoading/>
+                }
+                <SubTitle>{manga?.titleAlt}</SubTitle>
+                <p>{manga?.author}</p>
+                <ContentValues>
+                  <StarsContents>
+                    {stars}
+                  </StarsContents>
+                  <div onClick={handleVali} className={css`display:flex; align-items:center; gap:.100rem; cursor:pointer; &:hover {  background:var(--btn-filter-command);}`}>
+                      <p>{rating.average} ({rating.total})</p>
+                      <Down width={22} height={22}/>
+                  </div>
+                </ContentValues>
+                <GenresContent>
+                    {manga && manga.genres && manga.genres.map((genre, index) => (
+                      <Genres key={index}>{genre}</Genres>
+                    ))}
+                </GenresContent>
+                <OverView more={more}>{manga.overview}</OverView>
+                {more ? <MoreBtn onClick={toggleMore}>MENOS DETALLES</MoreBtn>:<MoreBtn onClick={toggleMore}>MÁS DETALLES</MoreBtn>}
+              </Info>
+            </Container>
+
+            {loading ? undefined: <div>
+                {page === 1 && 
+                    <p>capitulos</p>
+                }
+
+                {page === 2 &&
+                    <Comments id={manga._id} />
+                }
+            </div>}
+
+            {openVali && <ValidationBox ref={valiRef}>
+              <h2>Calificaciones</h2>
+              {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
+              <Border/>
+              {[5, 4, 3, 2, 1].map((value) => (
+                  <div key={value} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.400rem' }}>
+                      <Star width={22} height={22} style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}} />
+                      <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{value}</p>
+                    </div>
+                    {rating && rating[value.toString()] && <BarPuntation isClicked={value.toString()} numberS={rating.rating} percentage={rating[value.toString()].percentage} />}
+                    <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+                  </div>
+                ))}
+              <Border/>
+              <TextV>puntacion media: {rating.average} de 5</TextV>
+              <TextV>{rating.total.toString()} calificaciónes</TextV>
+            </ValidationBox>}
+
+            <OverLayy openVali={openVali}/>
+          </>
+      }
+    </>
   )
 }
 
@@ -540,8 +817,13 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
                   <TitleLoading/>}
 
                   <BtnsContent>
-                      {stars}
-                      <p onClick={handleVali}>{rating.average} ({rating.total})</p>
+                      <StarsContents>
+                        {stars}
+                      </StarsContents>
+                      <div onClick={handleVali} className={css`display:flex; align-items:center; gap:.100rem;`}>
+                        <p>{rating.average} ({rating.total})</p>
+                        <Down width={18} height={18}/>
+                      </div>
                   </BtnsContent>
           
                   <GenresContent>
@@ -590,18 +872,19 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
             </div>}
             
             {openVali && <ValidationBox ref={valiRef}>
+              <h2>Calificaciones</h2>
               {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
-              {rating.rating &&<Border/>}
-              {[5, 4, 3, 2, 1].map((value) => (
-                <div key={value} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem'}}>
-                  <div  style={{display: 'flex', alignItems: 'center', gap: '.400rem'}}>
-                    <Star width={22} height={22}/>
-                    <p>{value}</p>
+              <Border/>
+                {[5, 4, 3, 2, 1].map((value) => (
+                  <div key={value} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.400rem' }}>
+                      <Star width={22} height={22} style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}} />
+                      <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{value}</p>
+                    </div>
+                    {rating && rating[value.toString()] && <BarPuntation isClicked={value.toString()} numberS={rating.rating} percentage={rating[value.toString()].percentage} />}
+                    <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
                   </div>
-                  {rating && rating[value.toString()] && <BarPuntation percentage={rating[value.toString()].percentage} />}
-                  <p>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
-                </div>
-              ))}
+                ))}
               <Border/>
               <TextV>puntacion media: {rating.average} de 5</TextV>
               <TextV>{rating.total.toString()} calificaciónes</TextV>
@@ -626,7 +909,7 @@ const TextV = styled.p`
 
 const BarPuntation = styled.div`
   width: 200px;
-  height: 8px;
+  height: 4px;
   border-radius: 8px;
   background-color: #00000064;
   position: relative;
@@ -636,10 +919,10 @@ const BarPuntation = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    height: 8px;
-    height: 100%; /* Usa el 100% de la altura del contenedor */
     border-radius: 8px;
+    height: 4px;
+    height: 100%; /* Usa el 100% de la altura del contenedor */
     width: ${props => props.percentage}%;
-    background-color: var(--color);
+    background-color: ${props => (props.isClicked === props.numberS ? 'var(--main)' : 'var(--color)')};
   }
 `;

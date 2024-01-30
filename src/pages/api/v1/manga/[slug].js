@@ -82,7 +82,7 @@ export default async function handler(req, res) {
           try {
             const backgroundResponse = await fetch(`${serverUrl}/v1/api/background/${posterId}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJBQ1RJVkUiLCJjbGllbnRfdGFnIjoiKiIsImlkIjoiNTEwYTUzM2QtYmZhYi00ZDFiLThhMzItY2FmYmYyMTM5ZmIzIiwiaWF0IjoxNzA1NTIxNDY3fQ.Yj42p_D5xQelY-qxxYMh3zH35CavXNbMOEYrRDk7wok`
                 }
             });
         
