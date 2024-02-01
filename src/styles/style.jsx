@@ -44,6 +44,8 @@ export default function GlobalStyles({theme}) {
       --details-gradient-2:${theme === "--dark" ? "#000000d6": "#ffffffd6"};
       --details-gradient-3:${theme === "--dark" ? "#000000e8": "#ffffffe8"};
       --details-gradient-4:${theme === "--dark" ? "#000000": "#ffffff"};
+      --bars-: ${theme === "--dark" ? "#0009": "#0005"};
+      --bars-2: ${theme === "--dark" ? "#fff": "#000"};
     }
 
     * {
