@@ -131,6 +131,9 @@ const Genres = styled.span`
   padding:.200rem .600rem;
   border-radius: 0 10px 0 10px;
 
+  @media screen and (max-width: 995px) {
+    font-size:.925rem;
+  }
   
   @media screen and (max-width: 850px) {
     font-size:.825rem;
@@ -729,6 +732,12 @@ const OverView = styled.div`
     width:600px;
   }
 
+  @media screen and (max-width: 995px) {
+    width:550px;
+    font-size:.925rem;
+    line-height: 1.25rem;
+  }
+
   ${props => (props.more ? '' : '&::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(transparent, transparent, var(--details-gradient-4)); z-index: 0; }')}
 `
 
@@ -968,23 +977,27 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
               <h2>Calificaciones</h2>
               {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
               <Border/>
-                {[5, 4, 3, 2, 1].map((value) => (
-                  <div key={value} className={css`
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: .400rem;
-                    margin-top: 1rem;
-                    margin-bottom: 1rem;
-                  `}>
-                    <div className={css`display: flex; align-items: center; gap: .400rem;`}>
-                      <Star width={22} height={22} className={rating.rating === value.toString() ? css`color:var(--main); ` : ''} />
-                      <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{value}</p>
-                    </div>
-                    {rating && rating[value.toString()] && <BarPuntation isClicked={value.toString()} numberS={rating.rating} percentage={rating[value.toString()].percentage} />}
-                    <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+              {[5, 4, 3, 2, 1].map((value) => (
+                <div key={value} className={css`
+                  display: flex;
+                  width:100%;
+                  justify-content: space-between;
+                  align-items: center;
+                  gap: .400rem;
+                  margin-top: 1rem;
+                  margin-bottom: 1rem;
+                `}>
+                  <div className={css`display: flex; align-items: center; gap: .400rem;`}>
+                    <Star width={22} height={22} className={rating.rating === value.toString() ? css`color:var(--main); ` : ''} />
+                    <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{value}</p>
                   </div>
-                ))}
+
+                  <div className={css`position:relative;height: 0.3rem;margin: 0.625rem;background-color: #0009; flex: 1 1 auto;`}> 
+                    <div className={css`position:absolute;top:0;left:0;background-color:#ffff;height: 0.3rem;width:${rating[value].percentage}%;`}/>
+                  </div>    
+                  <p className={rating.rating === value.toString() ? css`color:var(--main); ` : css`width:35px;`}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+                </div>
+              ))}
               <Border/>
               <TextV>puntacion media: {rating.average} de 5</TextV>
               <TextV>{rating.total.toString()} calificaciónes</TextV>
