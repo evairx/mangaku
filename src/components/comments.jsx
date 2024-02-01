@@ -349,7 +349,6 @@ const MoreContent = styled.section`
     left: 105%;
     transform: translate(-50%, -90%);
     min-width:150px;
-    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.5);
 `
 
 const MoreBtns = styled.button`
@@ -938,8 +937,8 @@ export default function Comments({ id }) {
                                     <p>RESPONDER</p>
                                 </ReplyContent>
                                 }
-                                <ContentS openMore={comment._id === openMore} onClick={() => handleMore(comment._id)}>
-                                    {comment._id === openMore && <MoreContent ref={moreRef}>
+                                <ContentS ref={moreRef} openMore={comment._id === openMore} onClick={() => handleMore(comment._id)}>
+                                    {comment._id === openMore && <MoreContent>
                                         <MoreBtns>Reportar</MoreBtns>
                                         {user._id && user._id === comment.userId && <MoreBtns onClick={handleAlert}>Eliminar</MoreBtns>}
                                     </MoreContent>}

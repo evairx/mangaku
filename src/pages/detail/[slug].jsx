@@ -248,7 +248,7 @@ const ValidationBox = styled.section`
     background-color: var(--background-nav);
     height:360px;
     padding: 1rem;
-    border-radius: 18px;
+
     z-index: 999;
     width: 400px;
     text-align: center;
@@ -292,6 +292,38 @@ const StarsContents = styled.div`
 const Stars = styled.div`
     cursor:pointer;
 `
+
+const TextVali = styled.p`
+  color:var(--main);
+  font-weight:600;
+  font-size:1.050rem
+`;
+
+const TextV = styled.p`
+  font-weight:500;
+  margin-top:.700rem;
+  margin-bottom:.700rem;
+`;
+
+const BarPuntation = styled.div`
+  width: 200px;
+  height: 4px;
+  border-radius: 8px;
+  background-color: #00000064;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 8px;
+    height: 4px;
+    height: 100%; /* Usa el 100% de la altura del contenedor */
+    width: ${props => props.percentage}%;
+    background-color: ${props => (props.isClicked === props.numberS ? 'var(--main)' : 'var(--color)')};
+  }
+`;
 
 export default function Detail() {
   const isMobile = useQuery('(min-width: 850px)');
@@ -632,7 +664,7 @@ const Container = styled.section`
 
 const Background = styled.figure`
   position: absolute;
-  top: -20px;
+  top: -30px;
   left: 0;
   z-index: -10;
   width: 100%;
@@ -693,7 +725,7 @@ const ContentValues = styled.main`
 const OverView = styled.div`
   overflow:${props => (props.more ? 'auto' : 'hidden')};
   width:700px;
-  ${props => (props.more ? 'height: 170px;' : '')};
+  ${props => (props.more ? 'height: 160px;' : '')};
   font-size: 1.05rem;
   line-height: 1.55rem;
   font-weight:400;
@@ -742,11 +774,13 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
           <>
             <Container>
               <div>
+                {manga.background &&
                 <Background>
 `                  <picture>
                     <img src={manga?.background} alt={manga?.title}/>
                   </picture>
                 </Background>
+                }
                 <Info>
                 {manga.title ?
                   <Title>{manga?.title}</Title>
@@ -959,35 +993,3 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
         </>
     );
 }
-
-const TextVali = styled.p`
-  color:var(--main);
-  font-weight:600;
-  font-size:1.050rem
-`;
-
-const TextV = styled.p`
-  font-weight:500;
-  margin-top:.700rem;
-  margin-bottom:.700rem;
-`;
-
-const BarPuntation = styled.div`
-  width: 200px;
-  height: 4px;
-  border-radius: 8px;
-  background-color: #00000064;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 8px;
-    height: 4px;
-    height: 100%; /* Usa el 100% de la altura del contenedor */
-    width: ${props => props.percentage}%;
-    background-color: ${props => (props.isClicked === props.numberS ? 'var(--main)' : 'var(--color)')};
-  }
-`;

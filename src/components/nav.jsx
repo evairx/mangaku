@@ -19,9 +19,23 @@ function MenuDesktop({ handleDark, handleLight, handleSystem }) {
     const [user, setUser] = useState({});
     const [cookies] = useCookies(['token']);
     const [, , removeCookieFromSecond] = useCookies(['token']);
+    const [scroll, setScroll] = useState(false);
     const [userRef, openUser, setOpenUser] = useClick(false);
     const [themeRef, openTheme, setOpenTheme] = useClick(false);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 0;
+            setScroll(isScrolled);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -85,9 +99,10 @@ function MenuDesktop({ handleDark, handleLight, handleSystem }) {
         window.location.reload();
     }
 
+
     return (
         <>
-            <Style.Nav>
+            <Style.Nav scroll={scroll}>
                 <Style.Content>
                     <Bars width={32} height={32}/>
                     <Link href="/">

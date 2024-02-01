@@ -10,7 +10,9 @@ export const Nav = styled.nav`
     display:flex;
     justify-content: space-between;
     align-items:center;
-    transition: all .3s ease-out;;
+    transition: all .3s ease-out;
+
+    background: ${props => (props.scroll ? 'var(--background-nav)' : 'transparent')};
 
     @media screen and (max-width: 1000px) {
         padding: 0 2rem;
