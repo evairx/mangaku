@@ -253,8 +253,6 @@ const ValidationBox = styled.section`
     width: 400px;
     text-align: center;
     z-index: 1001;
-    -webkit-box-shadow: 0px 0px 15px 0px #000000; 
-    box-shadow: 0px 0px 15px 0px #000000;
 
     @media screen and (max-width: 653px) {
       min-height:240px;
@@ -495,7 +493,6 @@ export default function Detail() {
       stars.push(
         <div
           key={i}
-          className="star-container"
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={() => setHoveredStar(null)}
         >
@@ -685,13 +682,8 @@ const Title = styled.p`
   font-weight:600;
 `
 
-const SubTitle = styled.p`
-  font-size:1.2rem;
-  font-weight:500;
-`
-
 const ContentValues = styled.main`
-  margin-top:.800rem;
+
   display:flex;
   align-items:center;
   gap:.600rem;
@@ -701,7 +693,7 @@ const ContentValues = styled.main`
 const OverView = styled.div`
   overflow:${props => (props.more ? 'auto' : 'hidden')};
   width:700px;
-  ${props => (props.more ? 'height: 229px;' : '')};
+  ${props => (props.more ? 'height: 170px;' : '')};
   font-size: 1.05rem;
   line-height: 1.55rem;
   font-weight:400;
@@ -765,8 +757,8 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
                   <StarsContents>
                     {stars}
                   </StarsContents>
-                  <div onClick={handleVali} className={css`display:flex; align-items:center; gap:.100rem; cursor:pointer; &:hover {  background:var(--btn-filter-command);}`}>
-                      <p>{rating.average} ({rating.total})</p>
+                  <div onClick={handleVali} className={css`padding:.400rem;margin-bottom: 4px;display:flex; align-items:center; gap:.100rem; cursor:pointer; &:hover {  background:var(--btn-filter-command);}`}>
+                      <p>{rating.average}</p>
                       <Down width={22} height={22}/>
                   </div>
                 </ContentValues>
@@ -894,7 +886,7 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
                         {stars}
                       </StarsContents>
                       <div onClick={handleVali} className={css`display:flex; align-items:center; gap:.100rem;`}>
-                        <p>{rating.average} ({rating.totalFormatted})</p>
+                        <p>{rating.average}</p>
                         <Down width={18} height={18}/>
                       </div>
                   </BtnsContent>

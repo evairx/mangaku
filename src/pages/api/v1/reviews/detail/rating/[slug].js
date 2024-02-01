@@ -84,7 +84,6 @@ export default async function handler(req, res) {
             
                     result['average'] = overallAverage;
                     result['total'] = totalVotes.toLocaleString();
-                    result['totalFormatted'] = formatVotesCount(totalVotes);
             
                     return result;
                 };
