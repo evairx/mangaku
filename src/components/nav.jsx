@@ -213,12 +213,30 @@ function MenuDesktop({ handleDark, handleLight, handleSystem }) {
     )
 }
 
+function MenuMobile() {
+    return (
+        <>
+            <Style.NavMobile>
+                <Style.Content>
+                    <Bars width={32} height={32}/>
+                    <Link href="/">
+                        <Style.LogoContent>
+                            <Logo width={140} height={30}/>
+                        </Style.LogoContent>
+                    </Link>
+                </Style.Content>
+            </Style.NavMobile>
+            <Style.Space/>
+        </>
+    )
+}
+
 export default function Menu({handleDark, handleLight, handleSystem}) {
     const isMobile = useQuery('(max-width: 850px)');
 
     return(
         <>
-            {isMobile ? undefined: <MenuDesktop handleDark={handleDark} handleLight={handleLight} handleSystem={handleSystem}/>}
+            {isMobile ? <MenuMobile/>: <MenuDesktop handleDark={handleDark} handleLight={handleLight} handleSystem={handleSystem}/>}
         </>
     )
 }

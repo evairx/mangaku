@@ -18,12 +18,16 @@ const Container = styled.main`
   }
   
   @media screen and (max-width: 550px) {
-    height: 100vw;
+    height: 90vw;
   }
 
   @media screen and (max-width: 485px) {
     background: linear-gradient(rgba(0, 0, 0, 0), #00000075, #000000b7, #000000);
-    height: 170vw;
+    height: 120vw;
+  }
+
+  @media screen and (max-width: 390px) {
+    height: 140vw;
   }
 `
 
@@ -121,7 +125,7 @@ const Figure = styled.figure`
   }
 
   @media screen and (max-width: 680px) {
-    height: 465px;
+    height: 625px;
     width:100%;
 
     img {
@@ -130,7 +134,7 @@ const Figure = styled.figure`
   }
 
   @media screen and (max-width: 550px) {
-    height: 428px;
+    height: 498px;
     width:100%;
 
     img {

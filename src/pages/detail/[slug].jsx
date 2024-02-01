@@ -22,19 +22,6 @@ const ContainerMobile = styled.div`
   justify-content:center;
   position:relative;
 `
-
-const MainContent = styled.main`
-  display:flex;
-  justify-content:space-between;
-`
-
-const Btns = styled.div`
-  display: flex;
-  align-items:center;
-  gap:.200rem;
-  cursor: pointer;
-`
-
 const BtnsContent = styled.div`
   display:flex;
   align-items:center;
@@ -853,14 +840,21 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
               <h2>Calificaciones</h2>
               {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
               <Border/>
-              {[5, 4, 3, 2, 1].map((value) => (
-                  <div key={value} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.400rem' }}>
-                      <Star width={22} height={22} style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}} />
-                      <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{value}</p>
+                {[5, 4, 3, 2, 1].map((value) => (
+                  <div key={value} className={css`
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: .400rem;
+                    margin-top: 1rem;
+                    margin-bottom: 1rem;
+                  `}>
+                    <div className={css`display: flex; align-items: center; gap: .400rem;`}>
+                      <Star width={22} height={22} className={rating.rating === value.toString() ? css`color:var(--main); ` : ''} />
+                      <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{value}</p>
                     </div>
                     {rating && rating[value.toString()] && <BarPuntation isClicked={value.toString()} numberS={rating.rating} percentage={rating[value.toString()].percentage} />}
-                    <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+                    <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
                   </div>
                 ))}
               <Border/>
@@ -975,13 +969,20 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
               {rating.rating  && <TextVali>Le diste una calificación de {rating.rating} estrellas</TextVali>}
               <Border/>
                 {[5, 4, 3, 2, 1].map((value) => (
-                  <div key={value} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.400rem', marginTop: '1rem', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.400rem' }}>
-                      <Star width={22} height={22} style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}} />
-                      <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{value}</p>
+                  <div key={value} className={css`
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: .400rem;
+                    margin-top: 1rem;
+                    margin-bottom: 1rem;
+                  `}>
+                    <div className={css`display: flex; align-items: center; gap: .400rem;`}>
+                      <Star width={22} height={22} className={rating.rating === value.toString() ? css`color:var(--main); ` : ''} />
+                      <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{value}</p>
                     </div>
                     {rating && rating[value.toString()] && <BarPuntation isClicked={value.toString()} numberS={rating.rating} percentage={rating[value.toString()].percentage} />}
-                    <p style={rating.rating === value.toString() ? { color: 'var(--main)' } : {}}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
+                    <p className={rating.rating === value.toString() ? css`color:var(--main); ` : ''}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
                   </div>
                 ))}
               <Border/>

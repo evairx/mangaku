@@ -15,7 +15,11 @@ const HeliosStyle = styled.section`
   }
 
   @media screen and (max-width: 485px) {
-    height: 170vw;
+    height: 120vw;
+  }
+
+  @media screen and (max-width: 390px) {
+    height: 140vw;
   }
 `;
 

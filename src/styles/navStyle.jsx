@@ -23,6 +23,20 @@ export const Nav = styled.nav`
     }
 `
 
+export const NavMobile = styled.nav`
+    position:fixed;
+    top:0;
+    width:100%;
+    height:3.5rem;
+    z-index:999;
+    padding: 0 .800rem;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    transition: all .3s ease-out;
+    background: var(--background-nav);
+`
+
 export const LogoContent = styled.div`
     display:flex;
     justify-content:center;

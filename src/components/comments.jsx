@@ -266,15 +266,17 @@ const SpoilerContent = styled.div`
 `
 
 const TextArea = styled.textarea`
-  resize: none;
-  width: 800px;
-  padding: .400rem;
-  outline: none;
-  height: ${props => (props.actived ? '80px' : '35px')};
-  form-sizing: content;
-  background-color: var(--background-nav);
-  color: var(--color);
-  transition: ${props => (props.actived ? 'all .3s ease' : 'none')};
+    resize: none;
+    width: 800px;
+    padding: .400rem;
+    outline: none;
+    height: ${props => (props.actived ? '80px' : '35px')};
+    form-sizing: content;
+    background-color: var(--background-nav);
+    color: var(--color);
+    transition: ${props => (props.actived ? 'all .3s ease' : 'none')};
+    white-space: pre-wrap;
+    word-break: break-word;
 `
 
 const TextAreaMobile = styled.textarea`
@@ -287,13 +289,15 @@ const TextAreaMobile = styled.textarea`
     background-color: var(--background-nav);
     color: var(--color);
     transition: ${props => (props.actived ? 'all .3s ease' : 'none')};
+    white-space: pre-wrap;
+    word-break: break-word;
 
     @media screen and (max-width: 850px) {
         width: 500px;
     }
     
     @media screen and (max-width: 653px) {
-    width: 100%;
+        width: 100%;
     }
 `
 
