@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router';
 import { css } from '@emotion/css';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useQuery from "@/src/hooks/useQuery"
 import { useCookies } from 'react-cookie';
 import Star from "@/src/icon/star";
+import StarSemi from "@/src/icon/starSemi";
 import StarHalf from "@/src/icon/starHalf"
+import StarD from "@/src/icon/starD";
 import StarEmpty from "@/src/icon/starEmpty"
 import Down from "@/src/icon/down"
 import jwt from "jsonwebtoken"
@@ -246,6 +248,7 @@ const ValidationBox = styled.section`
     background-color: var(--background-nav);
     height:360px;
     padding: 1rem;
+    border-radius: 18px;
     z-index: 999;
     width: 400px;
     text-align: center;
@@ -254,7 +257,7 @@ const ValidationBox = styled.section`
     box-shadow: 0px 0px 15px 0px #000000;
 
     @media screen and (max-width: 653px) {
-      height:360px;
+      min-height:240px;
     }
 
     @media screen and (max-width: 420px) {
@@ -299,6 +302,7 @@ export default function Detail() {
   const [rating, setRating] = useState({});
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
+  const [hoveredStar, setHoveredStar] = useState(null);
   const [more, setMore] = useState(false);
   const [cookies] = useCookies(['token']);
   const router = useRouter();
@@ -472,21 +476,22 @@ export default function Detail() {
     setMore(!more)
   };
 
-  const [hoveredStar, setHoveredStar] = useState(null);
-
   const stars = [];
 
   const handleStarHover = (index) => {
     setHoveredStar(index);
   };
 
-
   const renderStars = (ratingValue, color) => {
     for (let i = 1; i <= 5; i++) {
       const isHovered = i <= hoveredStar;
-      const isFull = i <= Math.floor(parseFloat(ratingValue));
-      const isHalf = i === Math.ceil(parseFloat(ratingValue)) && ratingValue % 1 !== 0;
-
+      const isFull =  i <= Math.floor(parseFloat(ratingValue));
+      const decimalPart = parseFloat(ratingValue) % 1;
+      const isD = i === Math.ceil(parseFloat(ratingValue)) && decimalPart >= 0.1 && decimalPart <= 0.3;
+      const isHalf = i === Math.ceil(parseFloat(ratingValue)) && decimalPart > 0.3 && decimalPart <= 0.5;
+      const isSemi = i === Math.ceil(parseFloat(ratingValue)) && decimalPart > 0.5 && decimalPart <= 0.8;
+      const isMoreThanHalf = i === Math.ceil(parseFloat(ratingValue)) && decimalPart > 0.8;
+  
       stars.push(
         <div
           key={i}
@@ -495,8 +500,23 @@ export default function Detail() {
           onMouseLeave={() => setHoveredStar(null)}
         >
           <Stars>
-            {isFull ? (
+            {isFull || isMoreThanHalf ? (
               <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+            ) : isSemi ? (
+              isHovered ?
+              <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+              :
+              <StarSemi
                 onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
@@ -512,6 +532,21 @@ export default function Detail() {
               />
               :
               <StarHalf
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+              />
+            ) : isD ? (
+              isHovered ?
+              <Star
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
+                width={28}
+                height={28}
+                style={{ color: isHovered ? 'var(--main)' : color }}
+                />
+              :
+              <StarD
+                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
@@ -537,8 +572,10 @@ export default function Detail() {
       );
     }
   };
-  
-  if (!rating.rating || rating.rating === " ") {
+
+  if (hoveredStar !== null) {
+    renderStars(parseFloat(hoveredStar), 'var(--main)');
+  } else if (!rating.rating || rating.rating === " ") {
     renderStars(parseFloat(rating.average), 'currentColor');
   } else if (["1", "2", "3", "4", "5"].includes(rating.rating)) {
     renderStars(parseFloat(rating.rating), 'var(--main)');
@@ -661,23 +698,24 @@ const ContentValues = styled.main`
   font-size:1.2rem;
 `
 
-const OverView = styled.p`
-  width:${props => (props.more ? '100%' : '700px')};
+const OverView = styled.div`
+  overflow:${props => (props.more ? 'auto' : 'hidden')};
+  width:700px;
+  ${props => (props.more ? 'height: 229px;' : '')};
   font-size: 1.05rem;
   line-height: 1.55rem;
   font-weight:400;
   color:var(--color);
   display: -webkit-box;
-  -webkit-line-clamp: ${props => (props.more ? 'none' : '3')};
+  -webkit-line-clamp: ${props => (props.more ? 'none' : '5')};
   -webkit-box-orient: vertical;
-  overflow: hidden;
   ${props => (props.more ? '' : 'white-space: normal;')}
   ${props => (props.more ? '' : 'text-overflow: ellipsis;')}
   margin-top:1rem;
   position:relative;
 
   @media screen and (max-width: 1350px) {
-    width:${props => (props.more ? '100%' : '600px')};
+    width:600px;
   }
 
   ${props => (props.more ? '' : '&::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(transparent, transparent, var(--details-gradient-4)); z-index: 0; }')}
@@ -685,6 +723,14 @@ const OverView = styled.p`
 
 function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rating}) {
   const [valiRef, openVali, setOpenVali] = useClick(null);
+
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!more && containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [more]);
 
   function handleVali() {
     setOpenVali(!openVali)
@@ -719,8 +765,6 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
                   :
                   <TitleLoading/>
                 }
-                <SubTitle>{manga?.titleAlt}</SubTitle>
-                <p>{manga?.author}</p>
                 <ContentValues>
                   <StarsContents>
                     {stars}
@@ -735,7 +779,34 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
                       <Genres key={index}>{genre}</Genres>
                     ))}
                 </GenresContent>
-                <OverView more={more}>{manga.overview}</OverView>
+                <OverView more={more} ref={containerRef}>
+                  <p>{manga.overview}</p>
+
+                  {more && <Border/>}
+                  {more &&
+                  <>
+                  <Infox>
+                    <p>Autor</p>
+                    <p>{manga?.author}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Artista</p>
+                    <p>{manga?.artist}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Titulo Alternativo</p>
+                    <p>{manga?.titleAlt}</p>
+                  </Infox>
+                  <Border/>
+                  <Infox>
+                    <p>Publicación</p>
+                    <p>{manga?.publication}</p>
+                  </Infox>
+                  </>
+                  }
+                </OverView>
                 {more ? <MoreBtn onClick={toggleMore}>MENOS DETALLES</MoreBtn>:<MoreBtn onClick={toggleMore}>MÁS DETALLES</MoreBtn>}
               </Info>
             </Container>
@@ -821,7 +892,7 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
                         {stars}
                       </StarsContents>
                       <div onClick={handleVali} className={css`display:flex; align-items:center; gap:.100rem;`}>
-                        <p>{rating.average} ({rating.total})</p>
+                        <p>{rating.average} ({rating.totalFormatted})</p>
                         <Down width={18} height={18}/>
                       </div>
                   </BtnsContent>
