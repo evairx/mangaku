@@ -194,7 +194,6 @@ function MenuDesktop({ handleDark, handleLight, handleSystem }) {
                     <Style.OverLay openUser={openUser}/>
                 </Style.Content>
             </Style.Nav>
-            <Style.Space/>
         </>
     )
 }

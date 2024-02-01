@@ -302,7 +302,7 @@ export default function Detail() {
   const [rating, setRating] = useState({});
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
-  const [hoveredStar, setHoveredStar] = useState(null);
+  const [starRef, hoveredStar, setHoveredStar] = useClick(null);
   const [more, setMore] = useState(false);
   const [cookies] = useCookies(['token']);
   const router = useRouter();
@@ -499,7 +499,7 @@ export default function Detail() {
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={() => setHoveredStar(null)}
         >
-          <Stars>
+          <Stars ref={starRef}>
             {isFull || isMoreThanHalf ? (
               <Star
                 onClick={user && user._id ? () => addLike(manga._id, i) : null}
@@ -618,23 +618,24 @@ export default function Detail() {
 
 const Container = styled.section`
   display:flex;
-  padding:2rem 5rem;
+  justify-content:space-between;
+  padding:5rem 3.8rem;
   position:relative;
   transition: all .3 ease-out;
-  height:60vh;
+  min-height:60vh;
   
   @media screen and (max-width: 1400px) {
-    padding:2rem 4rem;
+    padding:5rem 4rem;
   }
 
   @media screen and (max-width: 1180px) {
-    padding:2rem 2rem;
+    padding:5rem 2rem;
   }
 `
 
 const Background = styled.figure`
   position: absolute;
-  top: 0;
+  top: -20px;
   left: 0;
   z-index: -10;
   width: 100%;
@@ -662,15 +663,14 @@ const Background = styled.figure`
 
 
 const Picture = styled.figure`
-  width: 360px;
-  height:auto;
+  width: 240px;
+  height:330px;
   z-index:1;
   overflow:hidden;
   -webkit-box-shadow: 0px 0px 15px -4px #000000; 
   box-shadow: 0px 0px 15px 0px #000000;
   border-radius:2px;
   margin-bottom:20px;
-  
    
   img {
     width:100%;
@@ -749,17 +749,13 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
           :
           <>
             <Container>
-              <Background>
-                <picture>
-                  <img src={manga?.background} alt={manga?.title}/>
-                </picture>
-              </Background>
-              <Picture>
-                <picture>
-                  <img src={manga?.poster} alt={manga?.title}/>
-                </picture>
-              </Picture>
-              <Info>
+              <div>
+                <Background>
+`                  <picture>
+                    <img src={manga?.background} alt={manga?.title}/>
+                  </picture>
+                </Background>
+                <Info>
                 {manga.title ?
                   <Title>{manga?.title}</Title>
                   :
@@ -809,6 +805,12 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
                 </OverView>
                 {more ? <MoreBtn onClick={toggleMore}>MENOS DETALLES</MoreBtn>:<MoreBtn onClick={toggleMore}>MÁS DETALLES</MoreBtn>}
               </Info>
+              </div>
+              <Picture>
+                <picture>
+                  <img src={manga?.poster} alt={manga?.title}/>
+                </picture>
+              </Picture>
             </Container>
 
             {loading ? undefined: <div>
