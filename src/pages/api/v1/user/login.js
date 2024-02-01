@@ -2,6 +2,9 @@ import Connect from "@/db/connect";
 import UserModel from "@/models/User"
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
+import geoip from 'geoip-lite'; 
+import requestIp from 'request-ip'
+import { v4 as uuidv4 } from 'uuid';
 
 export default async function handler(req, res) {
     const { method } = req;
@@ -27,10 +30,25 @@ export default async function handler(req, res) {
             res.status(400).json({ message: "Credenciales inválidas" });
         }
 
+        const ip = requestIp.getClientIp(req);
+
+        let country = "";
+
+        if (ip === "::1") {
+            country = "localhost";
+        } else {
+            const geo = geoip.lookup(ip);
+            country = geo ? geo.country : "";
+        }
+
         const datos = {
             status: "ACTIVE",
+            iss: "mangaku",
+            oauth_scopes: "account content reviews",
             client_tag: "*",
-            id: user._id
+            id: user._id,
+            country: country,
+            device_id: uuidv4()
         }
 
         const token = jwt.sign(datos, process.env.SECRET);

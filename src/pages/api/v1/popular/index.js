@@ -46,8 +46,7 @@ export default async function handler(req, res) {
             const genresIds = manga.genres;
             const genres = await Genres.find({ _id: { $in: genresIds } });
             manga.genres = genres.map(genre => genre.name);
-
-            const serverUrl = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `http://${req.headers.host}`;
+            const serverUrl = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}` : `https://${req.headers.host}`;
             const posterId = manga._id;
 
             try {

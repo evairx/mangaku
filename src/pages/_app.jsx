@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const obtenerTokenDesdeServidor = async () => {
       try {
-        const respuesta = await fetch('/api/v1/user/anony', {
+        const respuesta = await fetch('/api/v1/user/token', {
           method: 'POST',
         });
 
