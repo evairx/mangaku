@@ -41,9 +41,14 @@ export default function GlobalStyles({theme}) {
       --helios-gradient-3a:${theme === "--dark" ? "#000000c2": "#ffffffc2"};
       --details-gradient:${theme === "--dark" ? "#0000008d": "#ffffff8d"};
       --details-gradient-1:${theme === "--dark" ? "#000000ae": "#ffffffae"};
-      --details-gradient-2:${theme === "--dark" ? "#000000d6": "#ffffffd6"};
-      --details-gradient-3:${theme === "--dark" ? "#000000e8": "#ffffffe8"};
+      --details-gradient-2:${theme === "--dark" ? "#000000e8": "#ffffffd6"};
+      --details-gradient-3:${theme === "--dark" ? "#000000": "#ffffffe8"};
       --details-gradient-4:${theme === "--dark" ? "#000000": "#ffffff"};
+      --details-gradient-mobile:${theme === "--dark" ? "#0000008d": "#ffffff8d"};
+      --details-gradient-1-mobile:${theme === "--dark" ? "#000000ae": "#ffffffae"};
+      --details-gradient-2-mobile:${theme === "--dark" ? "#000000d6": "#ffffffd6"};
+      --details-gradient-3-mobile:${theme === "--dark" ? "#000000e8": "#ffffffe8"};
+      --details-gradient-4-mobile:${theme === "--dark" ? "#000000": "#ffffff"};
       --bars-: ${theme === "--dark" ? "#0009": "#0005"};
       --bars-2: ${theme === "--dark" ? "#fff": "#000"};
     }

@@ -50,7 +50,7 @@ const BackgroundMobile = styled.figure`
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(var(--details-gradient), var(--details-gradient-1),var(--details-gradient-2), var(--details-gradient-3), var(--details-gradient-4));
+    background: linear-gradient(var(--details-gradient-mobile), var(--details-gradient-1-mobile),var(--details-gradient-2-mobile), var(--details-gradient-3-mobile), var(--details-gradient-4-mobile));
     z-index: 0; /* Capa del fondo */
   }
 `;
@@ -61,8 +61,6 @@ const PictureMobile = styled.figure`
   z-index:1;
   margin-top:2rem;
   overflow:hidden;
-  -webkit-box-shadow: 0px 0px 15px -4px #000000; 
-  box-shadow: 0px 0px 15px 0px #000000;
   border-radius:2px;
   margin-bottom:20px;
   
@@ -659,7 +657,7 @@ const Background = styled.figure`
   width: 100%;
   height: 100%;
   overflow: hidden;
-  filter:blur(10px);
+  filter:blur(9px);
 
   img {
     height: 100%;
@@ -685,10 +683,14 @@ const Picture = styled.figure`
   height:330px;
   z-index:1;
   overflow:hidden;
-  -webkit-box-shadow: 0px 0px 15px -4px #000000; 
-  box-shadow: 0px 0px 15px 0px #000000;
   border-radius:2px;
   margin-bottom:20px;
+
+  
+  @media screen and (max-width: 882px) {
+    width: 200px;
+    height:280px;
+  }
    
   img {
     width:100%;
