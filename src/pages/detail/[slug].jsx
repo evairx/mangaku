@@ -450,6 +450,8 @@ export default function Detail() {
     
     const number = i;
 
+    console.log(number)
+
     setRating((prevRating) => {
       const updatedRating = { ...prevRating };
   
@@ -480,6 +482,7 @@ export default function Detail() {
     })
     .then(response => response.json())
     .then(data => {
+      console.log('Success:', data, number);
     })
     .catch(error => {
         console.error('Error al enviar comentario:', error);
@@ -502,6 +505,13 @@ export default function Detail() {
     setHoveredStar(index);
   };
 
+  const handleStarClick = (i) => {
+    if (user && user._id) {
+      console.log('click', i)
+      addLike(manga._id, i);
+    }
+  };
+
   const renderStars = (ratingValue, color) => {
     for (let i = 1; i <= 5; i++) {
       const isHovered = i <= hoveredStar;
@@ -518,10 +528,9 @@ export default function Detail() {
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={() => setHoveredStar(null)}
         >
-          <Stars ref={starRef}>
+          <Stars onClick={() => handleStarClick(i)}>
             {isFull || isMoreThanHalf ? (
               <Star
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
@@ -529,14 +538,12 @@ export default function Detail() {
             ) : isSemi ? (
               isHovered ?
               <Star
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
               />
               :
               <StarSemi
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
@@ -544,7 +551,6 @@ export default function Detail() {
             ) : isHalf ? (
               isHovered ?
               <Star
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
@@ -558,14 +564,12 @@ export default function Detail() {
             ) : isD ? (
               isHovered ?
               <Star
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
                 />
               :
               <StarD
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
@@ -573,14 +577,13 @@ export default function Detail() {
             ) : (
               isHovered ?
               <Star
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
+                className="xd"
                 style={{ color: isHovered ? 'var(--main)' : color }}
               />
               :
               <StarEmpty
-                onClick={user && user._id ? () => addLike(manga._id, i) : null}
                 width={28}
                 height={28}
                 style={{ color: isHovered ? 'var(--main)' : color }}
