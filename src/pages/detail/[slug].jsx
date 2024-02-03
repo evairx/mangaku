@@ -450,8 +450,6 @@ export default function Detail() {
     
     const number = i;
 
-    console.log(number)
-
     setRating((prevRating) => {
       const updatedRating = { ...prevRating };
   
@@ -482,7 +480,6 @@ export default function Detail() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Success:', data, number);
     })
     .catch(error => {
         console.error('Error al enviar comentario:', error);
@@ -507,7 +504,6 @@ export default function Detail() {
 
   const handleStarClick = (i) => {
     if (user && user._id) {
-      console.log('click', i)
       addLike(manga._id, i);
     }
   };
@@ -604,7 +600,7 @@ export default function Detail() {
   }
 
   const layout = {
-    title: loading ? 'Mangaku' : `${manga.title} | Mangaku`,
+    title: loading ? 'Mangaku' : `${manga?.title} | Mangaku`,
     description: '3',
   };
 
