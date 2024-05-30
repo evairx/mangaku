@@ -866,7 +866,7 @@ function DetailDesktop({loading, manga, user, more, toggleMore, page, stars, rat
                   </div>
 
                   <div className={css`position:relative;height: 0.3rem;margin: 0.625rem;background-color: var(--bars-); flex: 1 1 auto;`}> 
-                    <div className={css`position:absolute;top:0;left:0;background-color: var(--bars-2); ;height: 0.3rem;width:${rating[value].percentage}%;`}/>
+                    <div className={css`position:absolute;top:0;left:0;background-color:${rating.rating === value.toString() ? 'var(--main);':'var(--bars-2)'};height: 0.3rem;width:${rating[value].percentage}%;`}/>
                   </div>    
                   <p className={rating.rating === value.toString() ? css`color:var(--main); ` : css`width:35px;`}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
                 </div>
@@ -998,7 +998,7 @@ function DetailMobile({loading, manga, user, more, toggleMore, page, stars, rati
                   </div>
 
                   <div className={css`position:relative;height: 0.3rem;margin: 0.625rem;background-color: var(--bars-); flex: 1 1 auto;`}> 
-                    <div className={css`position:absolute;top:0;left:0;background-color: var(--bars-2); ;height: 0.3rem;width:${rating[value].percentage}%;`}/>
+                    <div className={css`position:absolute;top:0;left:0; background-color:${rating.rating === value.toString() ? 'var(--main);':'var(--bars-2)'};height: 0.3rem;width:${rating[value].percentage}%;`}/>
                   </div>    
                   <p className={rating.rating === value.toString() ? css`color:var(--main); ` : css`width:35px;`}>{rating && rating[value.toString()] && rating[value.toString()].percentage}%</p>
                 </div>
